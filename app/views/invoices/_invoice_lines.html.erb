@@ -35,18 +35,38 @@
 </tr>
 <% end %>
 
-<% invoice.tax_groups.each do |tax_group| %>
-<tr class="total tax">
-  <th colspan="<%= colspan%>" class="total"><%= "#{l(:label_invoice_tax)} (#{tax_group[0]}%)" %>:</th>
-  <th class="total_amount"> <%= price_to_currency(tax_group[1], invoice.currency)  %></th>
-</tr>
-<% end if invoice.tax_amount> 0 %>
+<% if InvoicesSettings.discount_after_tax?  %>
 
-<% if invoice.discount > 0  %>
-<tr class="total">
-  <th colspan="<%= colspan %>" class="total"><%= "#{l(:field_invoice_discount)}#{' (' + invoice.discount_rate.to_s + '%)' if invoice.discount_type == 0 }" %>:</th>
-  <th class="total_amount">-<%= price_to_currency(invoice.discount_amount, invoice.currency)  %></th>
-</tr>
+  <% invoice.tax_groups.each do |tax_group| %>
+  <tr class="total tax">
+    <th colspan="<%= colspan%>" class="total"><%= "#{l(:label_invoice_tax)} (#{tax_group[0]}%)" %>:</th>
+    <th class="total_amount"> <%= price_to_currency(tax_group[1], invoice.currency)  %></th>
+  </tr>
+  <% end if invoice.tax_amount> 0 %>
+
+  <% if invoice.discount > 0  %>
+  <tr class="total">
+    <th colspan="<%= colspan %>" class="total"><%= "#{l(:field_invoice_discount)} (#{invoice.discount.to_s}%)" %>:</th>
+    <th class="total_amount">-<%= price_to_currency(invoice.discount_amount, invoice.currency)  %></th>
+  </tr>
+  <% end %>
+
+<% else %>
+
+  <% if invoice.discount > 0  %>
+  <tr class="total">
+    <th colspan="<%= colspan %>" class="total"><%= "#{l(:field_invoice_discount)} (#{invoice.discount.to_s}%)" %>:</th>
+    <th class="total_amount">-<%= price_to_currency(invoice.discount_amount, invoice.currency)  %></th>
+  </tr>
+  <% end %>
+
+  <% invoice.tax_groups.each do |tax_group| %>
+  <tr class="total tax">
+    <th colspan="<%= colspan%>" class="total"><%= "#{l(:label_invoice_tax)} (#{tax_group[0]}%)" %>:</th>
+    <th class="total_amount"> <%= price_to_currency(tax_group[1], invoice.currency)  %></th>
+  </tr>
+  <% end if invoice.tax_amount> 0 %>
+
 <% end %>
 
 <tr class="total">

@@ -19,18 +19,13 @@
 <% end %>
 
 <p>
-  <label><%= l(:label_invoice_cross_project_contacts) %></label>
-  <%= check_box_tag 'settings[invoices_cross_project_contacts]', 1, @settings["invoices_cross_project_contacts"] %>
-</p>
-
-<p>
   <label><%= l(:label_invoice_show_units) %></label>
   <%= check_box_tag 'settings[show_units]', 1, @settings["show_units"] %>
 </p>
 
 <span id="tax_data">
   <p>
-    <label><%= l(:label_invoice_discount_including_tax) %></label>
+    <label><%= l(:label_invoice_discount_after_tax) %></label>
     <%= check_box_tag 'settings[invoices_discount_after_tax]', 1, @settings["invoices_discount_after_tax"] %>
   </p>
 

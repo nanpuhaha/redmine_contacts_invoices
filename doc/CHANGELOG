@@ -4,6 +4,18 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2013 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2014-10-02 v3.2.0
+
+* Invoices and expenses queries
+* Change line description db field type to text
+* Send invoice with attachments fixes
+* XSS for invoice line description fixes
+* Czech tranlsation (Martin Grůber)
+* Disable uniqueness validation for invoice line description
+* Fixed add permission check on invoice list page
+* Select Invoices/Expenses menu items on import
+* Ukrainian translation (Olexa)
+
 == 2014-05-03 v3.1.4
 
 * "Download as PDF" button in custom template public view

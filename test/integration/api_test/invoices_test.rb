@@ -22,7 +22,7 @@
 require File.expand_path('../../../test_helper', __FILE__)
 # require File.dirname(__FILE__) + '/../../../../../test/test_helper'
 
-class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base 
+class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base
   fixtures :projects,
            :users,
            :roles,
@@ -47,21 +47,18 @@ class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
                             [:contacts,
                              :contacts_projects,
                              :contacts_issues,
                              :deals,
                              :notes,
-                             :roles,
-                             :enabled_modules,
                              :tags,
-                             :taggings,
-                             :contacts_queries])   
+                             :taggings])
 
 
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
                           [:invoices,
                            :invoice_lines])
 
@@ -76,7 +73,7 @@ class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base
     Redmine::ApiTest::Base.should_allow_api_authentication(:get, "/invoices.xml")
      # test "should contain metadata" do
       get '/invoices.xml', {}, credentials('admin')
-      
+
       assert_tag :tag => 'invoices',
         :attributes => {
           :type => 'array',
@@ -92,19 +89,19 @@ class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base
   #   should_allow_api_authentication(:get, "/invoices/2.xml")
   # end
 
-  def test_post_invoices_xml 
+  def test_post_invoices_xml
     Redmine::ApiTest::Base.should_allow_api_authentication(:post,
                                     '/invoices.xml',
                                     {:invoice => {:project_id => 1, :number => 'INV/TEST-1'}},
                                     {:success_code => :created})
-  
+
       assert_difference('Invoice.count') do
         post '/invoices.xml', {:invoice => {:project_id => 1, :number => 'INV/TEST-1', :contact_id => 1, :status_id => 1, :invoice_date => Date.today}}, credentials('admin')
       end
 
       invoice = Invoice.first(:order => 'id DESC')
       assert_equal 'INV/TEST-1', invoice.number
-  
+
       assert_response :created
       assert_equal 'application/xml', @response.content_type
       assert_tag 'invoice', :child => {:tag => 'id', :content => invoice.id.to_s}
@@ -113,19 +110,19 @@ class Redmine::ApiTest::InvoicesTest < Redmine::ApiTest::Base
   # Issue 6 is on a private project
   def test_put_invoices_1_xml
       @parameters = {:invoice => {:number => 'NewNumber'}}
-    
+
       Redmine::ApiTest::Base.should_allow_api_authentication(:put,
                                     '/invoices/1.xml',
                                     {:invoice => {:number => 'NewNumber'}},
                                     {:success_code => :ok})
-  
+
       assert_no_difference('Invoice.count') do
         put '/invoices/1.xml', @parameters, credentials('admin')
       end
-  
+
       invoice = Invoice.find(1)
       assert_equal "NewNumber", invoice.number
-    
+
   end
-  
+
 end

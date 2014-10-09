@@ -87,7 +87,7 @@ en:
 
   #1.0.2
   label_invoice_show_in_pdf: Show in PDF
-  label_invoice_discount_including_tax: Discount including tax
+  label_invoice_discount_after_tax: Discount after tax
 
   #1.0.3
   label_invoice_use_rate_plugin: Use rate plugin
@@ -147,7 +147,7 @@ en:
       messages:
         text_invoice_cant_change_status: can't be changed
   label_invoice_status_canceled: Canceled
-  label_invoice_amount_due: Due
+  label_invoice_amount_due: Due amount
   label_invoice_payment: Invoice payment
   label_invoice_payment_plural: Payments
   label_invoice_payment_new: New invoice payment
@@ -197,3 +197,7 @@ en:
 
   #3.1.4
   label_invoice_download_as_pdf: Download as PDF
+
+  #3.2.0
+  label_invoice_amount_paid: Paid amount
+  label_invoices_copy_to_all: Copy to all

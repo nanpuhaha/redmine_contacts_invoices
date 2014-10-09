@@ -87,7 +87,7 @@ ko:
 
   #1.0.2
   label_invoice_show_in_pdf: PDF로 보기
-  label_invoice_discount_including_tax: 세금 포함 할인
+  label_invoice_discount_after_tax: 세금 포함 할인
 
   #1.0.3
   label_invoice_use_rate_plugin: Use rate plugin

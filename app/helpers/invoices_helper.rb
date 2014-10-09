@@ -37,6 +37,16 @@ module InvoicesHelper
     content_tag(:span, status_tag, :class => "tag-label-color invoice-status #{invoice_status_name(invoice.status_id, true).to_s}")
   end
 
+  def invoice_status_url(status_id, options={})
+    {:controller => 'invoices',
+     :action => 'index',
+     :set_filter => 1,
+     :project_id => @project,
+     :fields => [:status_id],
+     :values => {:status_id => [status_id]},
+     :operators => {:status_id => '='}}.merge(options)
+  end
+
   def invoice_tag(invoice)
     invoice_title = "##{invoice.number} - #{format_date(invoice.invoice_date)}"
     s = ''
@@ -61,23 +71,11 @@ module InvoicesHelper
   end
 
   def invoices_list_style
-    list_styles = ['list_excerpt', 'list']
-    if params[:invoices_list_style].blank?
-      list_style = list_styles.include?(session[:invoices_list_style]) ? session[:invoices_list_style] : InvoicesSettings.default_list_style
-    else
-      list_style = list_styles.include?(params[:invoices_list_style]) ? params[:invoices_list_style] : InvoicesSettings.default_list_style
-    end
-    session[:invoices_list_style] = list_style
+    'list_excerpt'
   end
 
   def expenses_list_style
-    list_styles = ['list_excerpt', 'list']
-    if params[:expenses_list_style].blank?
-      list_style = list_styles.include?(session[:expenses_list_style]) ? session[:expenses_list_style] : InvoicesSettings.default_list_style
-    else
-      list_style = list_styles.include?(params[:expenses_list_style]) ? params[:expenses_list_style] : InvoicesSettings.default_list_style
-    end
-    session[:expenses_list_style] = list_style
+    'list_excerpt'
   end
 
 
@@ -120,14 +118,12 @@ module InvoicesHelper
     collection_invoice_statuses.select{|s| s[1] != Invoice::PAID_INVOICE}
   end
 
-  def collection_invoice_statuses_for_filter(status_id)
+  def collection_invoice_statuses_for_filter(status_id=nil)
     collection = collection_invoice_statuses.map{|s| [s[0], s[1].to_s]}
     collection.push [l(:label_invoice_overdue), "d"]
     collection.insert 0, [l(:label_open_issues), "o"]
     collection.insert 0, [l(:label_all), ""]
-
-    options_for_select(collection, status_id)
-
+    collection
   end
 
   def label_with_currency(label, currency)
@@ -151,7 +147,7 @@ module InvoicesHelper
   end
 
   def discount_label(invoice)
-    "#{l(:field_invoice_discount)}#{' (' + "%2.f" % invoice.discount_rate.to_f + '%)' if invoice.discount_type == 0 }"
+    "#{l(:field_invoice_discount)} (#{"%2.f" % invoice.discount}%)"
   end
 
   def link_to_add_invoice_fields(name, f, association, options={})
@@ -164,8 +160,8 @@ module InvoicesHelper
 
   def retrieve_invoices_query
     # debugger
-    # params.merge!(session[:deals_query])
-    # session[:deals_query] = {:project_id => @project.id, :status_id => params[:status_id], :category_id => params[:category_id], :assigned_to_id => params[:assigned_to_id]}
+    # params.merge!(session[:invoices_query])
+    # session[:invoices_query] = {:project_id => @project.id, :status_id => params[:status_id], :category_id => params[:category_id], :assigned_to_id => params[:assigned_to_id]}
 
     if  params[:status_id] || !params[:contact_id].blank? || !params[:assigned_to_id].blank? || !params[:period].blank?
       session[:invoices_query] = {:project_id => (@project ? @project.id : nil),

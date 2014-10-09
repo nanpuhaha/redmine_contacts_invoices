@@ -87,7 +87,7 @@ ja:
 
   #1.0.2
   label_invoice_show_in_pdf: PDF形式で表示
-  label_invoice_discount_including_tax: 税込み値引き
+  label_invoice_discount_after_tax: 税込み値引き
 
   #1.0.3
   label_invoice_use_rate_plugin: レートプラグインを使用

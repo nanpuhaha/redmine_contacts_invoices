@@ -19,6 +19,9 @@
 
 class InvoiceMailsController < ApplicationController
   unloadable
+
+  menu_item :invoices
+
   helper :invoices
   include InvoicesHelper
 

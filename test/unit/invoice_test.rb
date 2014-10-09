@@ -46,15 +46,20 @@ class InvoiceTest < ActiveSupport::TestCase
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
                             [:contacts,
-                             :contacts_projects,
-                             :roles,
-                             :enabled_modules])   
+                             :contacts_projects])
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
                           [:invoices,
                            :invoice_lines])
+
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_products).directory + '/test/fixtures/',
+                      [:products,
+                       :order_statuses,
+                       :orders,
+                       :product_lines]) if InvoicesSettings.products_plugin_installed?
+
   def setup
     @project_a = Project.create(:name => "Test_a", :identifier => "testa")
     @project_b = Project.create(:name => "Test_b", :identifier => "testb")
@@ -80,9 +85,9 @@ class InvoiceTest < ActiveSupport::TestCase
     @time_entrie_3 = @issue_2.time_entries.create(:spent_on => '2012-12-12',
                                 :hours    => 12,
                                 :user     => User.find(2),
-                                :activity => TimeEntryActivity.first)    
+                                :activity => TimeEntryActivity.first)
   end
-  
+
   def test_should_calculate_amount
     @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 10)
     @invoice1.lines.new(:description => "Line 2", :quantity => 2, :price => 20)
@@ -108,6 +113,51 @@ class InvoiceTest < ActiveSupport::TestCase
     @invoice1.lines.last.destroy
     @invoice1.reload
     assert_equal 10, @invoice1.amount.to_i
+  end
+
+  def test_discount_after_tax
+    RedmineInvoices.settings["invoices_discount_after_tax"] = 1
+    @invoice1.discount_type = 0 #percent
+    @invoice1.discount = 10
+    @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
+    @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000)
+    assert @invoice1.save
+    assert_equal 2000.00, @invoice1.subtotal
+    assert_equal 200.00, @invoice1.tax_amount
+    assert_equal 200.00, @invoice1.tax_groups.first[1]
+    assert_equal 220.00, @invoice1.discount_amount
+    assert_equal 1980.00, @invoice1.amount
+  end
+
+  def test_discount_before_tax
+    RedmineInvoices.settings["invoices_discount_after_tax"] = 0
+    @invoice1.discount_type = 0 #percent
+    @invoice1.discount = 10
+    @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
+    @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000)
+    assert @invoice1.save
+    assert_equal 2000.00, @invoice1.subtotal
+    assert_equal 180.00, @invoice1.tax_amount
+    assert_equal 180.00, @invoice1.tax_groups.first[1]
+    assert_equal 200.00, @invoice1.discount_amount
+    assert_equal 1980.00, @invoice1.amount
+  end
+
+  def test_copy_from_object
+    if InvoicesSettings.products_plugin_installed?
+      order = Order.find(1)
+      invoice = Invoice.new
+      invoice.copy_from_object(:object_type => 'order', :object_id => 1)
+      assert_equal order.contact, invoice.contact
+      assert_equal order.order_number, invoice.order_number
+      assert_equal order.lines.size, invoice.lines.size
+
+      invoice = Invoice.new
+      invoice.copy_from_object(:object => order)
+      assert_equal order.contact, invoice.contact
+      assert_equal order.order_number, invoice.order_number
+      assert_equal order.lines.size, invoice.lines.size
+    end
   end
 
 end

@@ -20,7 +20,7 @@ two:
   number: 1/002
   currency: EUR
   discount: 10
-  discount_type: 1
+  discount_type: 0
   due_date: <%= Date.today %>
   invoice_date: <%= Date.today - 40 %>
   project_id: 1

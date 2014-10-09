@@ -19,6 +19,7 @@
 
 class Invoice < ActiveRecord::Base
   unloadable
+  include Redmine::SafeAttributes
 
   ESTIMATE_INVOICE = 0
   DRAFT_INVOICE = 1
@@ -72,16 +73,33 @@ class Invoice < ActiveRecord::Base
   acts_as_customizable
   acts_as_watchable
   acts_as_attachable
-  acts_as_priceable :amount, :tax_amount, :discount_amount
+  acts_as_priceable :amount, :tax_amount, :discount_amount, :balance, :remaining_balance
 
   before_save :calculate_amount
+  before_save :default_values
 
   validates_presence_of :number, :invoice_date, :project, :status_id
   validates_uniqueness_of :number
-  validates_numericality_of :discount, :allow_nil => true
+  validates_numericality_of :discount, :greater_than_or_equal_to => 0.0, :less_than_or_equal_to => 100.0, :allow_nil => true
   validate :validate_invoice
 
   accepts_nested_attributes_for :lines, :allow_destroy => true
+
+  safe_attributes 'number',
+    'subject',
+    'invoice_date',
+    'due_date',
+    'currency',
+    'language',
+    'discount',
+    'order_number',
+    'contact_id',
+    'status_id',
+    'assigned_to_id',
+    'project_id',
+    'description',
+    'lines_attributes',
+    :if => lambda {|order, user| order.new_record? || user.allowed_to?(:edit_invoices, order.project) }
 
   def calculate_status
     self.calculate_balance
@@ -104,9 +122,8 @@ class Invoice < ActiveRecord::Base
   end
   alias_method :calculate, :calculate_amount
 
-
   def tax_amount
-    self.lines.inject(0){|sum,x| sum + x.tax_amount}.to_f
+    self.lines.inject(0){|sum,x| sum + x.tax_amount * discount_rate}.to_f
   end
 
   def subtotal
@@ -114,22 +131,19 @@ class Invoice < ActiveRecord::Base
   end
 
   def discount_amount
-    ((discount_rate.to_f/100) * ((InvoicesSettings[:invoices_discount_after_tax, self.project].to_i > 0) ? subtotal + tax_amount : subtotal))
+    (discount / 100) * (InvoicesSettings.discount_after_tax? ? subtotal + tax_amount : subtotal)
   end
 
   def discount_rate
-    case discount_type
-    when 0
-      (discount % 100)
-    when 1
-      subtotal != 0 ? ((100 / ((InvoicesSettings[:invoices_discount_after_tax, self.project].to_i > 0) ? subtotal + tax_amount : subtotal)) * discount) : 0
-    else
-      (discount % 100)
-    end
+    InvoicesSettings.discount_after_tax? ? 1 : (1 - discount/100)
+  end
+
+  def discount
+    read_attribute(:discount).to_f
   end
 
   def tax_groups
-    self.lines.select{|l| !l.tax.blank? && l.tax.to_f > 0}.group_by{|l| l.tax}.map{|k, v| [k, v.sum{|l| l.tax_amount.to_f}] }
+    self.lines.select{|l| !l.tax.blank? && l.tax.to_f > 0}.group_by{|l| l.tax}.map{|k, v| [k, v.sum{|l| l.tax_amount.to_f * discount_rate}] }
   end
 
   def visible?(usr=nil)
@@ -152,7 +166,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def total_with_tax?
-    @total_with_tax ||= !InvoicesSettings.disable_taxes?(self.project) && (InvoicesSettings[:invoices_total_including_tax, self.project].to_i > 0)
+    @total_with_tax ||= !InvoicesSettings.disable_taxes?(self.project) && InvoicesSettings.total_including_tax?
   end
 
   def copy_from(arg)
@@ -264,7 +278,41 @@ class Invoice < ActiveRecord::Base
     [scope.sum(:amount, :group => :currency), scope.count(:number)]
   end
 
+  def copy_from_object(copy_from_object, options={})
+    return false if copy_from_object[:object].blank? && (copy_from_object[:object_type].blank? || copy_from_object[:object_id].blank?)
+    klass = Object.const_get(copy_from_object[:object_type].camelcase) rescue nil unless copy_from_object[:object_type].blank?
+    from_object = copy_from_object[:object] || klass.find(copy_from_object[:object_id])
+    self.contact = from_object.contact if from_object.respond_to?(:contact)
+    self.currency = from_object.currency if from_object.respond_to?(:currency)
+    self.order_number = from_object.order_number if from_object.respond_to?(:order_number)
+    if from_object.respond_to?(:lines)
+      from_object.lines.each do |line|
+        new_line = self.lines.new
+        new_line.position = line.position if line.respond_to?(:position)
+        new_line.description = line.full_description if line.respond_to?(:full_description)
+        new_line.tax = line.tax if line.respond_to?(:tax)
+        new_line.quantity = line.quantity if line.respond_to?(:quantity)
+        new_line.discount = line.discount if line.respond_to?(:discount)
+        new_line.price = line.price * (1 - new_line.discount.to_f / 100) if line.respond_to?(:price)
+      end
+    end
+
+  end
+
+
+  def contact_country
+    self.try(:contact).try(:address).try(:country)
+  end
+
+  def contact_city
+    self.try(:contact).try(:address).try(:city)
+  end
+
   private
+
+  def default_values
+    self.discount = 0 unless read_attribute(:discount)
+  end
 
   def validate_invoice
     if (status_id != PAID_INVOICE && remaining_balance == 0 && balance > 0) || (status_id == PAID_INVOICE && remaining_balance > 0 && amount > 0)

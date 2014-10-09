@@ -87,7 +87,7 @@ hu:
 
   #1.0.2
   label_invoice_show_in_pdf: Megjelenítés PDF-ben
-  label_invoice_discount_including_tax: Kedvezmény (adóval)
+  label_invoice_discount_after_tax: Kedvezmény (adóval)
 
   #1.0.3
   label_invoice_use_rate_plugin: Díjszabás plugin használata

@@ -21,8 +21,8 @@ Rails.configuration.to_prepare do
 
   require 'redmine_invoices/hooks/views_layouts_hook'
   require 'redmine_invoices/hooks/controller_contacts_duplicates_hook'
-
   require 'redmine_invoices/patches/application_helper_patch'
+  require 'redmine_invoices/patches/queries_helper_patch'
   require 'redmine_invoices/patches/project_patch'
   require 'redmine_invoices/patches/contact_patch'
   require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
@@ -47,6 +47,18 @@ class InvoicesSettings
     contacts_setting.blank? ? ContactsSetting.disable_taxes? : contacts_setting.to_i > 0
   end
 
+  def self.total_including_tax?
+     Setting.plugin_redmine_contacts_invoices["invoices_total_including_tax"].to_i > 0
+  end
+
+  def self.total_including_tax?
+     Setting.plugin_redmine_contacts_invoices["invoices_total_including_tax"].to_i > 0
+  end
+
+  def self.discount_after_tax?
+     Setting.plugin_redmine_contacts_invoices["invoices_discount_after_tax"].to_i > 0
+  end
+
   def self.email_from_address
     if Setting.plugin_redmine_contacts_invoices["invoices_email_current_user"].to_i > 0
       User.current.logged? ? "#{User.current.name} <#{User.current.mail}>" : Setting.mail_from
@@ -60,7 +72,7 @@ class InvoicesSettings
   end
 
   def self.show_units?(project_id = nil)
-    !!Setting.plugin_redmine_contacts_invoices["show_units"]
+    Setting.plugin_redmine_contacts_invoices["show_units"].to_i > 0
   end
 
   def self.custom_template(project_id = nil)
@@ -77,8 +89,13 @@ class InvoicesSettings
   end
 
   def self.public_links?
-    !!Setting.plugin_redmine_contacts_invoices["invoices_public_links"]
+    Setting.plugin_redmine_contacts_invoices["invoices_public_links"].to_i > 0
   end
+
+  def self.products_plugin_installed?
+    @@products_plugin_installed ||= (Redmine::Plugin.installed?(:redmine_products) && Redmine::Plugin.find(:redmine_products).version >= "1.0.3" )
+  end
+
 
 end
 
@@ -111,7 +128,7 @@ module RedmineInvoices
                  :conditions => {:project_id => project.id, :user_id => user.id},
                  :order => "#{Rate.table_name}.date_in_effect ASC").try(:amount).to_s
     else
-      ''
+      0.0
     end
   end
 

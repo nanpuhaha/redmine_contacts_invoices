@@ -87,7 +87,7 @@ sv:
 
   #1.0.2
   label_invoice_show_in_pdf: Visa som PDF
-  label_invoice_discount_including_tax: Rabatt ink. skatt
+  label_invoice_discount_after_tax: Rabatt ink. skatt
 
   #1.0.3
   label_invoice_use_rate_plugin: Använd kurs plugin

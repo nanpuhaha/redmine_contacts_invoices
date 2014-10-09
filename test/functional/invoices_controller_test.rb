@@ -52,11 +52,8 @@ class InvoicesControllerTest < ActionController::TestCase
                              :contacts_issues,
                              :deals,
                              :notes,
-                             :roles,
-                             :enabled_modules,
                              :tags,
-                             :taggings,
-                             :contacts_queries])
+                             :taggings])
 
     ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
                           [:invoices,
@@ -120,13 +117,76 @@ class InvoicesControllerTest < ActionController::TestCase
     assert_template :index
   end
 
-  test "should get index with filters" do
-    @request.session[:user_id] = 2
-    get :index, :status_id => 1
+  def test_index_with_short_filters
+    @request.session[:user_id] = 1
+    to_test = {
+      'status_id' => {
+        'o' => { :op => 'o', :values => [''] },
+        'c' => { :op => 'c', :values => [''] },
+        '1' => { :op => '=', :values => ['1'] },
+        '1|3|2' => { :op => '=', :values => ['1', '3', '2'] },
+        '=1' => { :op => '=', :values => ['1'] },
+        '!3' => { :op => '!', :values => ['3'] },
+        '!1|3|2' => { :op => '!', :values => ['1', '3', '2'] }},
+      'invoice_date' => {
+        '2011-10-12' => { :op => '=', :values => ['2011-10-12'] },
+        '=2011-10-12' => { :op => '=', :values => ['2011-10-12'] },
+        '>=2011-10-12' => { :op => '>=', :values => ['2011-10-12'] },
+        '<=2011-10-12' => { :op => '<=', :values => ['2011-10-12'] },
+        '><2011-10-01|2011-10-30' => { :op => '><', :values => ['2011-10-01', '2011-10-30'] },
+        '<t+2' => { :op => '<t+', :values => ['2'] },
+        '>t+2' => { :op => '>t+', :values => ['2'] },
+        't+2' => { :op => 't+', :values => ['2'] },
+        't' => { :op => 't', :values => [''] },
+        'w' => { :op => 'w', :values => [''] },
+        '>t-2' => { :op => '>t-', :values => ['2'] },
+        '<t-2' => { :op => '<t-', :values => ['2'] },
+        't-2' => { :op => 't-', :values => ['2'] }},
+      'number' => {
+        'INV' => { :op => '=', :values => ['INV'] },
+        '~IN' => { :op => '~', :values => ['IN'] },
+        '!~IN' => { :op => '!~', :values => ['IN'] }},
+      'created_at' => {
+        '>=2011-10-12' => { :op => '>=', :values => ['2011-10-12'] },
+        '<t-2' => { :op => '<t-', :values => ['2'] },
+        '>t-2' => { :op => '>t-', :values => ['2'] },
+        't-2' => { :op => 't-', :values => ['2'] }},
+      'updated_at' => {
+        '>=2011-10-12' => { :op => '>=', :values => ['2011-10-12'] },
+        '<t-2' => { :op => '<t-', :values => ['2'] },
+        '>t-2' => { :op => '>t-', :values => ['2'] },
+        't-2' => { :op => 't-', :values => ['2'] }},
+      'amount' => {
+        '=13.4' => { :op => '=', :values => ['13.4'] },
+        '>=45' => { :op => '>=', :values => ['45'] },
+        '<=125' => { :op => '<=', :values => ['125'] },
+        '><10.5|20.5' => { :op => '><', :values => ['10.5', '20.5'] },
+        '!*' => { :op => '!*', :values => [''] },
+        '*' => { :op => '*', :values => [''] }}
+    }
+
+    default_filter = { 'status_id' => {:operator => 'o', :values => [''] }}
+
+    to_test.each do |field, expression_and_expected|
+      expression_and_expected.each do |filter_expression, expected|
+        get :index, :set_filter => 1, field => filter_expression
+
+        assert_response :success
+        assert_template 'index'
+        assert_not_nil assigns(:invoices)
+
+        query = assigns(:query)
+        assert_not_nil query
+        assert query.has_filter?(field)
+        assert_equal(default_filter.merge({field => {:operator => expected[:op], :values => expected[:values]}}), query.filters)
+      end
+    end
+  end
+
+  def test_index_with_query_grouped_by_contact
+    @request.session[:user_id] = 1
+    get :index, :set_filter => 1, :group_by => 'contact', :sort => 'status:desc'
     assert_response :success
-    assert_template :index
-    assert_select '.invoice_list td.number a', '1/001'
-    assert_select '.invoice_list td.number a', {:count => 0, :text => '1/002'}
   end
 
   test "should get index with sorting" do
@@ -150,8 +210,16 @@ class InvoicesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:invoice)
     assert_not_nil assigns(:project)
 
-    assert_select 'div.subject h3', "Domoway - $3 321.00"
+    assert_select 'div.subject h3', "Domoway - $3 265.65"
     assert_select 'div.invoice-lines table.list tr.line-data td.description', "Consulting work"
+  end
+
+  def test_put_update_wiht_empty_discount
+    @request.session[:user_id] = 1
+    put :update, :id => 1, :invoice => {:discount => ''}
+    assert_equal 0, Invoice.find(1).discount
+    # assert_response :success
+    # raise "Не работает при портоном обновлении инвойса если стерерь скидку"
   end
 
   def test_get_show_as_pdf

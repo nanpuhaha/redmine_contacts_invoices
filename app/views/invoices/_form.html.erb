@@ -21,7 +21,7 @@
   </p>
   <p class="object-select">
     <%= label_tag :invoice_contact_id,  l(:field_invoice_contact)%>
-    <%= select_contact_tag('invoice[contact_id]', invoice.contact, :is_select => Contact.visible.by_project(RedmineInvoices.settings[:invoices_cross_project_contacts] ? nil : @project).count < 50, :cross_project_contacts => RedmineInvoices.settings[:invoices_cross_project_contacts], :is_company => RedmineInvoices.settings[:invoices_select_companies], :include_blank => true, :add_contact => true, :display_field => invoice.contact.blank?) %>
+    <%= select_contact_tag('invoice[contact_id]', invoice.contact, :is_select => Contact.visible.by_project(ContactsSetting.cross_project_contacts? ? nil : @project).count < 50, :is_company => RedmineInvoices.settings[:invoices_select_companies], :include_blank => true, :add_contact => true, :display_field => invoice.contact.blank?) %>
   </p>
   <p class="object-select"><%= f.select :assigned_to_id, (@project.assignable_users.collect {|m| [m.name, m.id]}), :include_blank => true, :label => l(:field_assigned_to) %></p>
 </div>
@@ -32,8 +32,12 @@
   <p><%= f.text_field :due_date, :label => l(:field_invoice_due_date), :size => 12 %><%= calendar_for('invoice_due_date') %> </p>
   <p><%= f.select :currency, collection_for_currencies_select, :label => l(:field_invoice_currency), :include_blank => true  %></p>
   <p>
-    <%= f.text_field :discount, :label => l(:field_invoice_discount), :size => 10 %>
-    <%= f.select :discount_type, collection_for_discount_types_select, {:no_label => true}, :style => "width: 55px;" %>
+    <%= check_box_tag :show_discount, "1", false, :onclick=>"$(this).hide(); $(this).parent().find('.discount-fields').show(); $(this).next().find('input').focus(); return false;" if f.object.discount.to_i == 0 %>
+    <label for="invoice_discount"><%= l(:field_invoice_discount) %></label>
+    <span class="discount-fields" style="white-space: nowrap; <%= f.object.discount.to_i == 0 ? "display:none;" : "" %>">
+      <%= f.text_field :discount, :no_label => true, :size => 5, :style => f.object.discount.to_f == 0 ? "display:none;" : "", :class => "discount-fields" %>&nbsp;%
+    </span>
+
   </p>
   <p class="object-select"><%= f.select :language, invoice_lang_options_for_select, {:label => l(:field_invoice_language)}, :disabled => InvoicesSettings.is_custom_template?(@project)  %></p>
 
@@ -73,6 +77,7 @@
       </td>
       <td class="total-data total" id="total_amount"><%= "%.2f" % invoice.amount.to_f %></td>
       <td class="total-data"></td>
+      <%= javascript_tag 'updateInvoiceTotal();' %>
     </tr>
   </table>
 
@@ -80,5 +85,15 @@
 
 </div>
 
+<script type="text/javascript">
+  // $(document).click(invoiceMenuHide);
+
+  $('td.price').mouseenter( invoiceMenuShow ).mouseleave( invoiceMenuHide );
+
+</script>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag('context_menu') %>
+<% end %>
 
 

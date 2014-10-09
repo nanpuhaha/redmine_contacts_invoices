@@ -14,7 +14,6 @@ div.issue.invoice {background: #EAF7FF;}
 /* INVOICE LIST
 /**********************************************************************/
 
-.invoice_list table.list td.amount, .invoice_list table.list tr:hover td.amount {border-left-style: hidden;padding-left: 10px;}
 .invoice_list table.list tr.invoice a {color: #666;}
 .invoice_list tr.odd.overdue, .invoice_list table.list tbody tr.odd.overdue:hover { color: #900; }
 .invoice_list tr.odd.overdue { background: #FEE; }

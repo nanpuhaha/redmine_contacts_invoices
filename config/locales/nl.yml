@@ -85,7 +85,7 @@ nl:
 
   #1.0.2
   label_invoice_show_in_pdf: Toon in PDF
-  label_invoice_discount_including_tax: Korting inclusief Btw
+  label_invoice_discount_after_tax: Korting inclusief Btw
 
   #1.0.3
   label_invoice_use_rate_plugin: Gebruik rate plugin

@@ -35,6 +35,7 @@
 
   $(".mail-macros a.mail-macro").bind("click", function() {
     $('#settings_invoices_email_template').insertAtCaret($(this).html());
+    return false;
   });
 </script>
 

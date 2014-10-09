@@ -87,7 +87,7 @@ es:
 
   #1.0.2
   label_invoice_show_in_pdf: Mostrar en el PDF
-  label_invoice_discount_including_tax: Descuento, IVA incluido
+  label_invoice_discount_after_tax: Descuento, IVA incluido
 
   #1.0.3
   label_invoice_use_rate_plugin: Ratio de uso

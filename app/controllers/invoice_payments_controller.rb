@@ -20,11 +20,13 @@
 class InvoicePaymentsController < ApplicationController
   unloadable
 
+  menu_item :invoices
+
   before_filter :find_invoice_payment_invoice, :only => [:create, :new]
-  before_filter :find_invoice_payment, :only => [:edit, :show, :destroy, :update]  
+  before_filter :find_invoice_payment, :only => [:edit, :show, :destroy, :update]
   before_filter :bulk_find_payments, :only => [:bulk_update, :bulk_edit, :bulk_destroy, :context_menu]
   before_filter :authorize, :except => [:index, :edit, :update, :destroy]
-  before_filter :find_optional_project, :only => [:index] 
+  before_filter :find_optional_project, :only => [:index]
 
   accept_api_auth :index, :show, :create, :update, :destroy
 
@@ -33,16 +35,16 @@ class InvoicePaymentsController < ApplicationController
   end
 
   def create
-    @invoice_payment = InvoicePayment.new(params[:invoice_payment])  
+    @invoice_payment = InvoicePayment.new(params[:invoice_payment])
     # @invoice.contacts = [Contact.find(params[:contacts])]
-    @invoice_payment.invoice = @invoice 
-    @invoice_payment.author = User.current  
+    @invoice_payment.invoice = @invoice
+    @invoice_payment.author = User.current
     if @invoice_payment.save
       attachments = Attachment.attach_files(@invoice_payment, (params[:attachments] || (params[:invoice_payment] && params[:invoice_payment][:uploads])))
       render_attachment_warning_if_needed(@invoice_payment)
 
       flash[:notice] = l(:notice_successful_create)
-      
+
       respond_to do |format|
         format.html { redirect_to invoice_path(@invoice) }
         format.api  { render :action => 'show', :status => :created, :location => invoice_payment_url(@invoice_payment) }
@@ -55,7 +57,7 @@ class InvoicePaymentsController < ApplicationController
     end
   end
 
-  def destroy  
+  def destroy
     if @invoice_payment.destroy
       flash[:notice] = l(:notice_successful_delete)
     else
@@ -77,7 +79,7 @@ class InvoicePaymentsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render_404
   end
-  
+
   def find_invoice_payment
     @invoice_payment = InvoicePayment.find(params[:id], :include => {:invoice => :project})
     @project ||= @invoice_payment.project

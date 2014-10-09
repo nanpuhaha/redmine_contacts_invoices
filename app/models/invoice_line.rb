@@ -23,7 +23,6 @@ class InvoiceLine < ActiveRecord::Base
   belongs_to :invoice
 
   validates_presence_of :description, :price, :quantity
-  validates_uniqueness_of :description, :scope => :invoice_id
   validates_numericality_of :price, :quantity
 
   delegate :currency, :to => :invoice, :allow_nil => true
@@ -39,7 +38,7 @@ class InvoiceLine < ActiveRecord::Base
   end
 
   def tax_amount
-    ContactsSetting.tax_exclusive? ? self.tax_exclusive : self.tax_inclusive
+    (ContactsSetting.tax_exclusive? ? self.tax_exclusive : self.tax_inclusive)
   end
 
   def price=(pr)
@@ -59,7 +58,7 @@ class InvoiceLine < ActiveRecord::Base
   end
 
   def tax_inclusive
-    total - (total/(1+tax.to_f/100))
+    total * (1 - (1/(1+tax.to_f/100)))
   end
 
   def tax_exclusive

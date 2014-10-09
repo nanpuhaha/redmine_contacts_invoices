@@ -177,11 +177,18 @@ module RedmineInvoices
         lines << ['']
         lines << ['', '', '', '', l(:label_invoice_sub_amount) + ":", price_to_currency(invoice.subtotal, invoice.currency, :converted => false, :symbol => false)]  if invoice.discount_amount > 0 || (invoice.tax_amount> 0 && !invoice.total_with_tax?)
 
-        invoice.tax_groups.each do |tax_group|
-          lines << ['', '', '', '', "#{l(:label_invoice_tax)} (#{invoice_number_format(tax_group[0])}%):", price_to_currency(tax_group[1], invoice.currency, :converted => false, :symbol => false)]
-        end if invoice.tax_amount> 0
 
-        lines << ['', '', '', '', discount_label(invoice) + ":", "-" + price_to_currency(invoice.discount_amount, invoice.currency, :converted => false, :symbol => false)] if invoice.discount_amount > 0
+        if InvoicesSettings.discount_after_tax?
+          invoice.tax_groups.each do |tax_group|
+            lines << ['', '', '', '', "#{l(:label_invoice_tax)} (#{invoice_number_format(tax_group[0])}%):", price_to_currency(tax_group[1], invoice.currency, :converted => false, :symbol => false)]
+          end if invoice.tax_amount> 0
+          lines << ['', '', '', '', discount_label(invoice) + ":", "-" + price_to_currency(invoice.discount_amount, invoice.currency, :converted => false, :symbol => false)] if invoice.discount_amount > 0
+        else
+          lines << ['', '', '', '', discount_label(invoice) + ":", "-" + price_to_currency(invoice.discount_amount, invoice.currency, :converted => false, :symbol => false)] if invoice.discount_amount > 0
+          invoice.tax_groups.each do |tax_group|
+            lines << ['', '', '', '', "#{l(:label_invoice_tax)} (#{invoice_number_format(tax_group[0])}%):", price_to_currency(tax_group[1], invoice.currency, :converted => false, :symbol => false)]
+          end if invoice.tax_amount> 0
+        end
 
         lines << ['', '', '', '', label_with_currency(:label_invoice_total, invoice.currency) + ":", price_to_currency(invoice.amount, invoice.currency, :converted => false, :symbol => false)]
 

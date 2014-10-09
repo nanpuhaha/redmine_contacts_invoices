@@ -87,7 +87,7 @@ bg:
 
   #1.0.2
   label_invoice_show_in_pdf: Покажи в PDF
-  label_invoice_discount_including_tax: Намалението с включен ДДС
+  label_invoice_discount_after_tax: Намалението с включен ДДС
 
   #1.0.3
   label_invoice_use_rate_plugin: Use rate plugin

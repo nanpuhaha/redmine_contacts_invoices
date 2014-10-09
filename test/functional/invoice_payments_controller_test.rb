@@ -46,17 +46,15 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
                             [:contacts,
                              :contacts_projects,
                              :contacts_issues,
                              :notes,
-                             :roles,
-                             :enabled_modules,
                              :tags,
-                             :taggings])   
+                             :taggings])
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', 
+    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
                           [:invoices,
                            :invoice_lines,
                            :invoice_payments
@@ -65,19 +63,19 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
   def setup
     RedmineInvoices::TestCase.prepare
     Project.find(1).enable_module!(:contacts_invoices)
-    
-    User.current = nil  
+
+    User.current = nil
   end
-  
+
   def test_should_get_new
     @request.session[:user_id] = 1
-    
+
     get :new, :invoice_id => 1
     assert_response :success
     assert_template :new
     assert_not_nil assigns(:invoice)
     assert_not_nil assigns(:invoice_payment)
-  end  
+  end
 
   def test_should_post_create
     @request.session[:user_id] = 1
@@ -94,7 +92,7 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
       assert_equal 10, payment.amount
     end
 
-  end  
+  end
 
   def test_should_post_create_paid
     @request.session[:user_id] = 1
@@ -102,20 +100,20 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
     invoice.calculate_amount
     invoice.calculate_balance
     invoice.save!
-    assert_difference 'Invoice.find(2).remaining_balance', -4695 do
-      post :create, :invoice_id => 2, :invoice_payment => {:amount => 4695.0, :payment_date => Date.today, :description => "New full payment"}
+    assert_difference 'Invoice.find(2).remaining_balance', -4232.5 do
+      post :create, :invoice_id => 2, :invoice_payment => {:amount => 4232.5, :payment_date => Date.today, :description => "New full payment"}
       assert_response :redirect
-      assert_equal 4695, InvoicePayment.find_by_description("New full payment").amount
+      assert_equal 4232.5, InvoicePayment.find_by_description("New full payment").amount
       assert Invoice.find(2).is_paid?
     end
 
-  end 
+  end
 
   def test_should_delete_destroy
     @request.session[:user_id] = 1
     assert_difference 'InvoicePayment.count', -1 do
       delete :destroy, :invoice_id => 1, :id => 1
     end
-  end    
+  end
 
 end

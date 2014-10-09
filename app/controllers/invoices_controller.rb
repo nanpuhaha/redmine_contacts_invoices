@@ -25,63 +25,77 @@ class InvoicesController < ApplicationController
   before_filter :bulk_find_invoices, :only => [:bulk_update, :bulk_edit, :bulk_destroy, :context_menu]
   before_filter :authorize, :except => [:index, :edit, :update, :destroy, :auto_complete, :client_view]
   before_filter :find_optional_project, :only => [:index]
+  before_filter :calc_statistics, :only => [:index, :show]
 
   accept_api_auth :index, :show, :create, :update, :destroy
 
   helper :attachments
   helper :issues
   helper :contacts
-  include ContactsHelper
   helper :timelog
   helper :watchers
   helper :custom_fields
   helper :sort
   helper :context_menus
+  helper :crm_queries
+  helper :queries
   include SortHelper
   include InvoicesHelper
+  include ContactsHelper
+  include QueriesHelper
+  include CrmQueriesHelper
 
   def index
-    # retrieve_invoices_query
+    retrieve_crm_query('invoice')
+    sort_init(@query.sort_criteria.empty? ? [['invoice_date', 'desc']] : @query.sort_criteria)
+    sort_update(@query.sortable_columns)
+    @query.sort_criteria = sort_criteria.to_a
 
-    @current_week_sum = Invoice.sum_by_period("current_week", @project)
-    @last_week_sum = Invoice.sum_by_period("last_week", @project)
-    @current_month_sum = Invoice.sum_by_period("current_month", @project)
-    @last_month_sum = Invoice.sum_by_period("last_month", @project)
-    @current_year_sum = Invoice.sum_by_period("current_year", @project)
-
-    @status_stat = {}
-
-    @draft_status_sum, @draft_status_count = Invoice.sum_by_status(Invoice::DRAFT_INVOICE, @project)
-    @estimate_status_sum, @estimate_status_count = Invoice.sum_by_status(Invoice::ESTIMATE_INVOICE, @project)
-    @sent_status_sum, @sent_status_count = Invoice.sum_by_status(Invoice::SENT_INVOICE, @project)
-    @paid_status_sum, @paid_status_count = Invoice.sum_by_status(Invoice::PAID_INVOICE, @project)
-    @canceled_status_sum, @canceled_status_count = Invoice.sum_by_status(Invoice::CANCELED_INVOICE, @project)
-
-    respond_to do |format|
-      format.html do
-         params[:status_id] = "o" unless params.has_key?(:status_id)
-         @invoices = find_invoices
-         request.xhr? ? render( :partial => invoices_list_style, :layout => false, :locals => {:invoices => @invoices}) : last_comments
+    if @query.valid?
+      case params[:format]
+      when 'csv', 'pdf'
+        @limit = Setting.issues_export_limit.to_i
+      when 'atom'
+        @limit = Setting.feeds_limit.to_i
+      when 'xml', 'json'
+        @offset, @limit = api_offset_and_limit
+      else
+        @limit = per_page_option
       end
-      format.api { @invoices = find_invoices }
+
+      @invoiced_amount = @query.invoiced_amount
+      @paid_amount = @query.paid_amount
+      @due_amount = @query.due_amount
+
+      @invoices_count = @query.object_count
+      @invoices_scope = @query.objects_scope
+      @invoices_pages = Paginator.new @invoices_count, @limit, params['page']
+      @offset ||= @invoices_pages.offset
+      @invoice_count_by_group = @query.object_count_by_group
+      @invoices = @query.results_scope(
+        :include => [{:contact => [:avatar, :projects, :address]}, :author],
+        :search => params[:search],
+        :order => sort_clause,
+        :limit  =>  @limit,
+        :offset =>  @offset
+      )
+
+      respond_to do |format|
+        format.html
+        format.api
+      end
+    else
+      respond_to do |format|
+        format.html { render(:template => 'invoices/index', :layout => !request.xhr?) }
+        format.any(:atom, :csv, :pdf) { render(:nothing => true) }
+        format.api { render_validation_errors(@query) }
+      end
     end
+  rescue ActiveRecord::RecordNotFound
+    render_404
   end
 
   def show
-
-    @current_week_sum = Invoice.sum_by_period("current_week", nil, @invoice.contact_id)
-    @last_week_sum = Invoice.sum_by_period("last_week", nil, @invoice.contact_id)
-    @current_month_sum = Invoice.sum_by_period("current_month", nil, @invoice.contact_id)
-    @last_month_sum = Invoice.sum_by_period("last_month", nil, @invoice.contact_id)
-    @current_year_sum = Invoice.sum_by_period("current_year", nil, @invoice.contact_id)
-
-    @status_stat = {}
-
-    @draft_status_sum, @draft_status_count = Invoice.sum_by_status(Invoice::DRAFT_INVOICE, nil, @invoice.contact_id)
-    @estimate_status_sum, @estimate_status_count = Invoice.sum_by_status(Invoice::ESTIMATE_INVOICE, nil, @invoice.contact_id)
-    @sent_status_sum, @sent_status_count = Invoice.sum_by_status(Invoice::SENT_INVOICE, nil, @invoice.contact_id)
-    @paid_status_sum, @paid_status_count = Invoice.sum_by_status(Invoice::PAID_INVOICE, nil, @invoice.contact_id)
-    @canceled_status_sum, @canceled_status_count = Invoice.sum_by_status(Invoice::CANCELED_INVOICE, nil, @invoice.contact_id)
 
     @invoice_lines = @invoice.lines || []
     @payments = @invoice.payments
@@ -107,10 +121,13 @@ class InvoicesController < ApplicationController
     @invoice.lines.build if @invoice.lines.blank?
 
     @last_invoice_number = Invoice.last.try(:number)
+  rescue ActiveRecord::RecordNotFound
+    render_404
   end
 
   def create
-    @invoice = Invoice.new(params[:invoice])
+    @invoice = Invoice.new
+    @invoice.safe_attributes = params[:invoice]
     @invoice.project ||= @project
     @invoice.author = User.current
     if @invoice.save
@@ -138,7 +155,8 @@ class InvoicesController < ApplicationController
 
   def update
     (render_403; return false) unless @invoice.editable_by?(User.current)
-    if @invoice.update_attributes(params[:invoice])
+    @invoice.safe_attributes = params[:invoice]
+    if @invoice.save
       flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html { redirect_to :action => "show", :id => @invoice }
@@ -230,6 +248,26 @@ class InvoicesController < ApplicationController
 
   private
 
+  def calc_statistics
+    current_project = @invoice ? nil : @project
+    contact_id = @invoice ? @invoice.contact_id : nil
+
+    @current_week_sum = Invoice.sum_by_period("current_week", current_project, contact_id)
+    @last_week_sum = Invoice.sum_by_period("last_week", current_project, contact_id)
+    @current_month_sum = Invoice.sum_by_period("current_month", current_project, contact_id)
+    @last_month_sum = Invoice.sum_by_period("last_month", current_project, contact_id)
+    @current_year_sum = Invoice.sum_by_period("current_year", current_project, contact_id)
+
+    @status_stat = {}
+
+    @draft_status_sum, @draft_status_count = Invoice.sum_by_status(Invoice::DRAFT_INVOICE, current_project, contact_id)
+    @estimate_status_sum, @estimate_status_count = Invoice.sum_by_status(Invoice::ESTIMATE_INVOICE, current_project, contact_id)
+    @sent_status_sum, @sent_status_count = Invoice.sum_by_status(Invoice::SENT_INVOICE, current_project, contact_id)
+    @paid_status_sum, @paid_status_count = Invoice.sum_by_status(Invoice::PAID_INVOICE, current_project, contact_id)
+    @canceled_status_sum, @canceled_status_count = Invoice.sum_by_status(Invoice::CANCELED_INVOICE, current_project, contact_id)
+
+  end
+
   def last_comments
     @last_comments = []
   end
@@ -239,49 +277,6 @@ class InvoicesController < ApplicationController
     @project = Project.find(project_id)
   rescue ActiveRecord::RecordNotFound
     render_404
-  end
-
-  def find_invoices(pages=true)
-    from, to = RedmineContacts::DateUtils.retrieve_date_range(params[:period].to_s)
-    paid_from, paid_to = RedmineContacts::DateUtils.retrieve_date_range(params[:period].to_s)
-    scope = Invoice.scoped({})
-    scope = scope.by_project(@project.id) if @project
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.status_id = ?", params[:status_id]]) if (!params[:status_id].blank? && params[:status_id] != "o" && params[:status_id] != "d")
-    scope = scope.open if (params[:status_id] == "o") || (params[:status_id] == "d")
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.contact_id = ?", params[:contact_id]]) if !params[:contact_id].blank?
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.assigned_to_id = ?", params[:assigned_to_id]]) if !params[:assigned_to_id].blank?
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.due_date <= ? AND #{Invoice.table_name}.status_id = ?", Date.today, Invoice::SENT_INVOICE]) if (params[:status_id] == "d")
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.due_date <= ?", params[:due_date].to_date]) if (!params[:due_date].blank? && is_date?(params[:due_date]))
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.invoice_date BETWEEN ? AND ?", from, to]) if (from && to)
-    scope = scope.scoped(:conditions => ["#{Invoice.table_name}.paid_date BETWEEN ? AND ?", paid_from, paid_to]) if (paid_from && paid_to) && params[:paid_period]
-
-    sort_init ['status', ['invoice_date', 'DESC']]
-    sort_update 'invoice_date' => 'invoice_date',
-                'status' => "#{Invoice.table_name}.status_id",
-                'amount' => 'currency, amount',
-                'due_date' => 'due_date',
-                'updated_at' => "#{Invoice.table_name}.updated_at",
-                'number' => 'number'
-
-    scope = scope.visible
-
-    @invoices_count = scope.count
-    @paid_amount = scope.sent_or_paid.sum(:balance, :group => :currency)
-    @invoiced_amount = scope.sum(:amount, :group => :currency)
-    @due_amount = scope.sent_or_paid.sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance", :group => :currency)
-    scope = scope.scoped(:order => sort_clause) if sort_clause
-    if pages
-      @limit =  per_page_option
-      @invoices_pages = Paginator.new(self, @invoices_count,  @limit, params[:page])
-      @offset = @invoices_pages.current.offset
-
-      scope = scope.scoped :limit  => @limit, :offset => @offset
-      @invoices = scope
-
-      fake_name = @invoices.first.amount if @invoices.length > 0 #without this patch paging does not work
-    end
-
-    scope
   end
 
   # Filter for bulk issue invoices

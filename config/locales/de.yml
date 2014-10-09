@@ -86,7 +86,7 @@ de:
 
   #1.0.2
   label_invoice_show_in_pdf: Anzeige in PDF
-  label_invoice_discount_including_tax: Ermäßigung enthält Steuer
+  label_invoice_discount_after_tax: Ermäßigung enthält Steuer
 
   #1.0.3
   label_invoice_use_rate_plugin: Verwende Rate Plugin
@@ -177,7 +177,7 @@ de:
   label_invoice_template_custom: "Eigene Vorlage"
   label_invoice_public_links: Öffentliche Links
   label_invoice_recurring: Wiederkehrende Rechnung
-  
+
   #3.0.1
   permission_add_invoices: Rechnung hinzufügen
   permission_add_expenses: Aufwendung hinzufügen
@@ -193,4 +193,3 @@ de:
   #3.1.1
   label_invoice_hours: Stunden
   label_invoice_email_curent_user: Aktuelle Benutzer E-Mail
-  

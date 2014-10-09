@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '3.1.4'
+INVOICES_VERSION_NUMBER = '3.2.0'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do
@@ -28,8 +28,13 @@ Redmine::Plugin.register :redmine_contacts_invoices do
   url 'http://redminecrm.com/projects/invoices'
   author_url 'mailto:support@redminecrm.com'
 
-  requires_redmine :version_or_higher => '2.1.2'
-  requires_redmine_plugin :redmine_contacts, :version_or_higher => '3.2.16'
+  requires_redmine :version_or_higher => '2.3'
+
+  begin
+    requires_redmine_plugin :redmine_contacts, :version_or_higher => '3.4.1'
+  rescue Redmine::PluginNotFound  => e
+    raise "Please install redmine_contacts plugin"
+  end
 
   settings :default => {
     :invoices_company_name => "Your company name",

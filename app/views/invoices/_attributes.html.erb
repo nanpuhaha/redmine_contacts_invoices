@@ -13,7 +13,7 @@
   </tr>
   <tr>
       <th class="assigned-to"><%=l(:field_invoice_assigned_to)%>:</th><td class="assigned-to"><%= avatar(invoice.assigned_to, :size => "14") %><%= invoice.assigned_to ? link_to_user(invoice.assigned_to) : "-" %></td>
-      <th class="progress"><%=l(:field_invoice_discount)%>:</th><td class="progress"><%= progress_bar invoice.discount_rate, :width => '80px', :legend => "#{invoice.discount_rate.to_f.round(2)}% / #{price_to_currency(invoice.discount_amount, invoice.currency)}".html_safe %></td>
+      <th class="progress"><%=l(:field_invoice_discount)%>:</th><td class="progress"><%= progress_bar invoice.discount, :width => '80px', :legend => "#{invoice.discount.round(2)}% / #{price_to_currency(invoice.discount_amount, invoice.currency)}".html_safe if invoice.discount > 0 %></td>
   </tr>
   <%= call_hook(:view_invoices_show_details_bottom, :invoice => invoice) %>
 </table>

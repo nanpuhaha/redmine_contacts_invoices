@@ -87,7 +87,7 @@ pt-BR:
 
   #1.0.2
   label_invoice_show_in_pdf: Show in PDF
-  label_invoice_discount_including_tax: Descontos incluindo impostos
+  label_invoice_discount_after_tax: Descontos incluindo impostos
 
   #1.0.3
   label_invoice_use_rate_plugin: Use rate plugin

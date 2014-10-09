@@ -86,7 +86,7 @@ ru:
 
   #1.0.2
   label_invoice_show_in_pdf: Показывать в PDF
-  label_invoice_discount_including_tax: Включать налог в скидку
+  label_invoice_discount_after_tax: Включать налог в скидку
 
   #1.0.3
   label_invoice_use_rate_plugin: Использовать плагин Rate

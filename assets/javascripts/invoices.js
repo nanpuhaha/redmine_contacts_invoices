@@ -7,9 +7,11 @@ function remove_invoice_fields (link) {
 
 function add_invoice_fields (link, association, content) {
 	var	new_id = new Date().getTime();
+  var regexp = new RegExp("new_" + association, "g");
 	var regexp = new RegExp("new_" + association, "g");
 	$('#sortable tr').last().after(content.replace(regexp, new_id));
   updateInvoiceTotal();
+  $('#invoice_lines_attributes_' + new_id + '_price').mouseenter( invoiceMenuShow ).mouseleave( invoiceMenuHide );
   $('#invoice_lines_attributes_' + new_id + '_description').focus();
 }
 
@@ -77,6 +79,20 @@ function updateInvoiceTotal(element) {
 
   $('#total_amount').html(amttoal.toFixed(2));
 
+}
+
+function invoiceMenuHide() {
+  $('.invoice-menu').hide();
+}
+
+function invoiceMenuShow() {
+  $(this).parent().find('.invoice-menu').show();
+}
+
+function copyPriceToAll(element){
+  $('td.price input').val($(element).closest('td.price').find('input').val());
+  updateInvoiceTotal();
+  return false;
 }
 
 $(function() {
