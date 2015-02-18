@@ -201,3 +201,9 @@ en:
   #3.2.0
   label_invoice_amount_paid: Paid amount
   label_invoices_copy_to_all: Copy to all
+
+  #3.2.2
+  permission_save_expenses_queries: Save expenses queries
+  permission_manage_public_expenses_queries: Manage public expenses queries
+  permission_save_invoices_queries: Save invoices queries
+  permission_manage_public_invoices_queries: Manage public invoices queries

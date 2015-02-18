@@ -3,14 +3,14 @@
 <div class="box tabular attributes">
 
 <div class="splitcontentleft">
-  <p><%= f.text_field :number, :label => l(:field_invoice_number), :required => true, :style => "width: 90%" %>
+  <p><%= f.text_field :number, :label => l(:field_invoice_number), :required => true, :style => "width: 95%" %>
     <% if invoice.new_record? && @last_invoice_number %>
     <br>
   	<em class="info"><%= l(:label_invoice_last_number, :number => @last_invoice_number) %></em>
   	<% end %>
   </p>
 
-  <p class="subject"><%= f.text_field :subject, :label => l(:field_invoice_subject), :style => "width: 90%" %></p>
+  <p class="subject"><%= f.text_field :subject, :label => l(:field_invoice_subject), :style => "width: 95%" %></p>
   <p><%= f.select :project_id, project_tree_options_for_select(Invoice.allowed_target_projects, :selected => @project), {:required => true} %></p>
   <p class="object-select">
     <% if !invoice.new_record? && invoice.is_paid? %>
@@ -30,7 +30,6 @@
   <p><%= f.text_field :order_number, :label => l(:field_invoice_order_number) %> </p>
   <p><%= f.text_field :invoice_date, :size => 12, :required => true %><%= calendar_for('invoice_invoice_date') %> </p>
   <p><%= f.text_field :due_date, :label => l(:field_invoice_due_date), :size => 12 %><%= calendar_for('invoice_due_date') %> </p>
-  <p><%= f.select :currency, collection_for_currencies_select, :label => l(:field_invoice_currency), :include_blank => true  %></p>
   <p>
     <%= check_box_tag :show_discount, "1", false, :onclick=>"$(this).hide(); $(this).parent().find('.discount-fields').show(); $(this).next().find('input').focus(); return false;" if f.object.discount.to_i == 0 %>
     <label for="invoice_discount"><%= l(:field_invoice_discount) %></label>
@@ -39,11 +38,13 @@
     </span>
 
   </p>
+  <p><%= f.select :currency, collection_for_currencies_select, :label => l(:field_invoice_currency), :include_blank => true  %></p>
   <p class="object-select"><%= f.select :language, invoice_lang_options_for_select, {:label => l(:field_invoice_language)}, :disabled => InvoicesSettings.is_custom_template?(@project)  %></p>
 
 </div>
 
 <div style="clear:both;"> </div>
+<%= call_hook(:edit_invoices_form_details_bottom, { :invoice => invoice, :form => f }) %>
 
 <p><%= f.text_area :description, :cols => 60, :rows => 10, :class => 'wiki-edit' %><%= wikitoolbar_for 'invoice_description' %></p>
 

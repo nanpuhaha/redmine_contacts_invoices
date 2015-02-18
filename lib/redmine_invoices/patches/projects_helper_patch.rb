@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ module RedmineInvoices
         base.class_eval do
           unloadable
 
-          alias_method_chain :project_settings_tabs, :invoices          
+          alias_method_chain :project_settings_tabs, :invoices
         end
       end
 
@@ -40,13 +40,14 @@ module RedmineInvoices
           tabs.push({ :name => 'invoices',
             :action => :manage_invoices,
             :partial => 'projects/invoices_settings',
-            :label => :label_invoice_plural })
-          tabs.select {|tab| User.current.allowed_to?(tab[:action], @project)}
+            :label => :label_invoice_plural }) if User.current.allowed_to?(:manage_invoices, @project)
+
+          tabs
 
         end
-        
+
       end
-      
+
     end
   end
 end

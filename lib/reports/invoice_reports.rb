@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -79,13 +79,6 @@ module RedmineInvoices
         invoice_data << [l(:field_invoice_due_date) + ":", format_date(invoice.due_date)] if invoice.due_date
         invoice_data << [l(:field_invoice_order_number) + ":", invoice.order_number] unless invoice.order_number.blank?
         invoice_data << [l(:field_invoice_subject) + ":", invoice.subject] unless invoice.subject.blank?
-
-        invoice.custom_values.each do |custom_value|
-          if !custom_value.value.blank? && custom_value.custom_field.is_for_all?
-            invoice_data << [custom_value.custom_field.name + ":",
-                             RedmineContacts::CSVUtils.csv_custom_value(custom_value)]
-          end
-        end
 
         invoice_data << [l(:label_invoice_bill_to) + ":",
                          "#{contact.name}

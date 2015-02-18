@@ -7,11 +7,10 @@
   <% end %>
   <td class="price">
     <%= f.text_field :price, :no_label => true, :size => 8, :onkeyup => 'updateInvoiceTotal(this)' %>
-    <%= javascript_tag "$(this).parent().find('td.price').mouseenter(invoiceMenuShow).mouseleave(invoiceMenuHide);" %>
-    <div id="context-menu" class="invoice-menu" style="display:none; position: absolute;">
-      <ul>
-        <li><a href="#" onclick="copyPriceToAll(this);"><%= l(:label_invoices_copy_to_all) %></a></li>
-      </ul>
+    <div class="jstElements invoice-menu" style="display:none;" title="<%= l(:label_invoices_copy_to_all) %>">
+        <button type="button" class="icon-money-dollar" onclick="copyPriceToAll(this);">
+          <span><%= l(:label_invoices_copy_to_all) %></span>
+        </button>
     </div>
   </td>
   <% if !InvoicesSettings.disable_taxes?(@project) || (f.object.invoice.respond_to?(:has_taxes?) && f.object.invoice.has_taxes?)   %>

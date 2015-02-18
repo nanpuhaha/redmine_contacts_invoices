@@ -5,11 +5,6 @@
 	<em class="info">%%YEARLY_ID%%, %%MONTHLY_ID%%, %%DAILY_ID%%, %%ID%%, %%YEAR%%, %%MONTH%%, %%DAY%%</em>
 </p>
 
-<p>
-  <label><%= l(:label_invoice_excerpt_invoice_list) %></label>
-  <%= check_box_tag 'settings[invoices_excerpt_invoice_list]', 1, @settings["invoices_excerpt_invoice_list"] %>
-</p>
-
 
 <% if RedmineInvoices.rate_plugin_installed? %>
 <p>

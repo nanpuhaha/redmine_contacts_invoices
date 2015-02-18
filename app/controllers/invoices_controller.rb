@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -39,6 +39,7 @@ class InvoicesController < ApplicationController
   helper :context_menus
   helper :crm_queries
   helper :queries
+  helper :calendars
   include SortHelper
   include InvoicesHelper
   include ContactsHelper
@@ -69,6 +70,7 @@ class InvoicesController < ApplicationController
 
       @invoices_count = @query.object_count
       @invoices_scope = @query.objects_scope
+
       @invoices_pages = Paginator.new @invoices_count, @limit, params['page']
       @offset ||= @invoices_pages.offset
       @invoice_count_by_group = @query.object_count_by_group

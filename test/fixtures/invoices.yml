@@ -5,7 +5,7 @@ one:
   status_id: 1
   description: First invoice description
   number: 1/001
-  due_date: <%= Date.today + 2 %>
+  due_date: <%= (Date.today + 2).to_s(:db) %>
   invoice_date: <%= Date.today %>
   project_id: 1
   discount: 10
@@ -22,7 +22,7 @@ two:
   discount: 10
   discount_type: 0
   due_date: <%= Date.today %>
-  invoice_date: <%= Date.today - 40 %>
+  invoice_date: <%= 40.days.ago.to_s(:db) %>
   project_id: 1
   assigned_to_id: 2
 three:
@@ -32,5 +32,5 @@ three:
   description: Third invoice description
   number: 1/003
   due_date: <%= Date.today - 5 %>
-  invoice_date: <%= Date.today - 7 %>
+  invoice_date: <%= 7.days.ago.to_s(:db) %>
   project_id: 2

@@ -4,6 +4,27 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2013 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2014-11-14 v3.2.3
+
+* Custom fields fixes for Redmine < 2.5
+* Fixed bug with creating invoice from order with empty item price field
+* language field added to Liquid drop
+
+== 2014-11-10 v3.2.2
+
+* Invoices calendar view
+* Custom field as filter for expenses
+* Import dates fixes
+* Serbian translation (Radenko)
+
+== 2014-10-16 v3.2.1
+
+* Custom fields styles
+* New styles for copy to all invoice items amount
+* Fixes for seach by custom values
+* Fixed creating expenses from global list
+* Fixes for expense table view links
+
 == 2014-10-02 v3.2.0
 
 * Invoices and expenses queries

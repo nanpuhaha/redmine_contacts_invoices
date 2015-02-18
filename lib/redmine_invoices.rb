@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -68,7 +68,7 @@ class InvoicesSettings
   end
 
   def self.default_list_style
-    Setting.plugin_redmine_contacts_invoices["invoices_excerpt_invoice_list"].to_i > 0 ? 'list_excerpt' : 'list'
+    'list_excerpt'
   end
 
   def self.show_units?(project_id = nil)

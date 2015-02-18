@@ -39,7 +39,14 @@ table.invoices.index td.status { padding: 13px 5px 0px 10px;}
 table.invoices.index td.name.invoice-name { width: 80%;}
 table.invoices.index td.info.invoice-info {white-space: nowrap; text-align: right;padding-right: 10px;}
 table.contacts.index th.sum.invoices-sum,
+table.contacts.index .amount,
+table.contacts.index .remaining_balance,
+table.contacts.index .balance,
 .invoice_list th.sum.invoices-sum,
+.invoice_list td.amount,
+.invoice_list td.remaining_balance,
+.invoice_list td.balance,
+.expense_list td.price,
 .expense_list th.sum.invoices-sum { text-align: right; white-space: nowrap; width: 10%;}
 table.contacts.index .invoice-date {margin-top: 3px;}
 table.contacts.index .overdue-days {color: #B54;}
@@ -162,6 +169,10 @@ table.invoice-lines.form td#total_amount {
 	border-top-color: #D7D7D7;
 	border-top-width: 1px;
 	font-weight: bold;
+}
+table.invoice-lines.form div.jstElements.invoice-menu {
+	display: inline;
+	position: absolute;
 }
 
 /**********************************************************************/

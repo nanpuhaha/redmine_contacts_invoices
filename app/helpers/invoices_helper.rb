@@ -3,7 +3,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -70,8 +70,18 @@ module InvoicesHelper
     end
   end
 
+  def invoices_list_styles_for_select
+    list_styles = [[l(:label_crm_list_excerpt), "list_excerpt"]]
+  end
+
   def invoices_list_style
-    'list_excerpt'
+    list_styles = invoices_list_styles_for_select.map(&:last)
+    if params[:invoices_list_style].blank?
+      list_style = list_styles.include?(session[:invoices_list_style]) ? session[:invoices_list_style] : InvoicesSettings.default_list_style
+    else
+      list_style = list_styles.include?(params[:invoices_list_style]) ? params[:invoices_list_style] : InvoicesSettings.default_list_style
+    end
+    session[:invoices_list_style] = list_style
   end
 
   def expenses_list_style

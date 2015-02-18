@@ -20,8 +20,9 @@
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path('../../test_helper', __FILE__)
+require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
-class InvoicePaymentsControllerTest < ActionController::TestCase
+class RedmineInvoices::CommonViewsTest < ActionController::IntegrationTest
   fixtures :projects,
            :users,
            :roles,
@@ -50,70 +51,46 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
                             [:contacts,
                              :contacts_projects,
                              :contacts_issues,
+                             :deals,
                              :notes,
                              :tags,
                              :taggings])
 
     ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
                           [:invoices,
-                           :invoice_lines,
-                           :invoice_payments
-                           ])
+                           :invoice_lines])
 
   def setup
     RedmineInvoices::TestCase.prepare
-    Project.find(1).enable_module!(:contacts_invoices)
 
-    User.current = nil
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @request.env['HTTP_REFERER'] = '/'
   end
 
-  def test_should_get_new
-    @request.session[:user_id] = 1
-
-    get :new, :invoice_id => 1
+  test "View invoices activity" do
+    log_user("admin", "admin")
+    get "/projects/ecookbook/activity?show_invoices=1"
     assert_response :success
-    assert_template :new
-    assert_not_nil assigns(:invoice)
-    assert_not_nil assigns(:invoice_payment)
   end
 
-  def test_should_post_create
-    @request.session[:user_id] = 1
-    invoice = Invoice.find(2)
-    invoice.calculate_amount
-    invoice.calculate_balance
-    invoice.save!
-
-    assert_difference 'Invoice.find(2).remaining_balance', -10 do
-      post :create, :invoice_id => 2, :invoice_payment => {:amount => 10.0, :payment_date => Date.today, :description => "New partial payment"}
-      assert_response :redirect
-      invoice = Invoice.find(2)
-      payment = invoice.payments.last
-      assert_equal 10, payment.amount
-    end
-
+  test "View invoices settings" do
+    log_user("admin", "admin")
+    get "/settings/plugin/redmine_contacts_invoices"
+    assert_response :success
   end
 
-  def test_should_post_create_paid
-    @request.session[:user_id] = 1
-    invoice = Invoice.find(2)
-    invoice.calculate_amount
-    invoice.calculate_balance
-    invoice.save!
-    assert_difference 'Invoice.find(2).remaining_balance', -4232.5 do
-      post :create, :invoice_id => 2, :invoice_payment => {:amount => 4232.5, :payment_date => Date.today, :description => "New full payment"}
-      assert_response :redirect
-      assert_equal 4232.5, InvoicePayment.find_by_description("New full payment").amount
-      assert Invoice.find(2).is_paid?
-    end
-
+  test "View invoices project settings" do
+    log_user("admin", "admin")
+    get "/projects/ecookbook/settings/invoices"
+    assert_response :success
   end
 
-  def test_should_delete_destroy
-    @request.session[:user_id] = 1
-    assert_difference 'InvoicePayment.count', -1 do
-      delete :destroy, :invoice_id => 1, :id => 1
-    end
+  test "Global search with invoices" do
+    log_user("admin", "admin")
+    get "/search?q=INV"
+    assert_response :success
   end
+
 
 end

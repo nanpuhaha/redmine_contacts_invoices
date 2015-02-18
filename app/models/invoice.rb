@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -61,7 +61,6 @@ class Invoice < ActiveRecord::Base
                             :timestamp => "#{table_name}.created_at",
                             :author_key => :author_id,
                             :find_options => {:include => :project}
-
   acts_as_searchable :columns => ["#{table_name}.number"],
                      :date_column => "#{table_name}.created_at",
                      :include => [:project],
@@ -70,7 +69,6 @@ class Invoice < ActiveRecord::Base
                      # sort by id so that limited eager loading doesn't break with postgresql
                      :order_column => "#{table_name}.number"
 
-  acts_as_customizable
   acts_as_watchable
   acts_as_attachable
   acts_as_priceable :amount, :tax_amount, :discount_amount, :balance, :remaining_balance
@@ -288,12 +286,12 @@ class Invoice < ActiveRecord::Base
     if from_object.respond_to?(:lines)
       from_object.lines.each do |line|
         new_line = self.lines.new
-        new_line.position = line.position if line.respond_to?(:position)
+        new_line.position = line.position if line.respond_to?(:position) && line.position
         new_line.description = line.full_description if line.respond_to?(:full_description)
-        new_line.tax = line.tax if line.respond_to?(:tax)
-        new_line.quantity = line.quantity if line.respond_to?(:quantity)
-        new_line.discount = line.discount if line.respond_to?(:discount)
-        new_line.price = line.price * (1 - new_line.discount.to_f / 100) if line.respond_to?(:price)
+        new_line.tax = line.tax if line.respond_to?(:tax) && line.tax
+        new_line.quantity = line.quantity if line.respond_to?(:quantity) && line.quantity
+        new_line.discount = line.discount if line.respond_to?(:discount) && line.discount
+        new_line.price = line.price.to_f * (1 - new_line.discount.to_f / 100) if line.respond_to?(:price)
       end
     end
 

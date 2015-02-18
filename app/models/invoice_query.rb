@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ class InvoiceQuery < CrmQuery
     QueryColumn.new(:remaining_balance, :sortable => ["#{Invoice.table_name}.currency", "#{Invoice.table_name}.amount - #{Invoice.table_name}.balance"], :default_order => 'desc', :caption => :label_invoice_amount_due),
     QueryColumn.new(:status, :sortable => "#{Invoice.table_name}.status_id", :groupable => true, :caption => :field_invoice_status),
     QueryColumn.new(:currency, :sortable => "#{Invoice.table_name}.currency", :groupable => true, :caption => :field_invoice_currency),
-    QueryColumn.new(:contact, :sortable => "#{Invoice.table_name}.contact_id", :groupable => true, :caption => :field_invoice_contact),
+    QueryColumn.new(:contact, :sortable => lambda {Contact.fields_for_order_statement}, :groupable => true, :caption => :field_invoice_contact),
     QueryColumn.new(:language, :sortable => "#{Invoice.table_name}.language", :groupable => true, :caption => :field_invoice_language),
     QueryColumn.new(:order_number, :sortable => "#{Invoice.table_name}.order_number", :groupable => true, :caption => :field_invoice_order_number),
     QueryColumn.new(:contact_city, :caption => :label_crm_contact_city, :groupable => "#{Address.table_name}.city", :sortable => "#{Address.table_name}.city"),
@@ -65,7 +65,7 @@ class InvoiceQuery < CrmQuery
 
 
     add_available_filter("status_id",
-      :type => :list_status, :values => collection_invoice_statuses.map{|s| [s[0], s[1].to_s]}, :label => :field_invoice_status
+      :type => :list_status, :values => collection_invoice_statuses.map{|s| [s[0], s[1].to_s]}, :label => :field_invoice_status, :order => 1
     )
 
     add_available_filter("contact_id",

@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2013 Kirill Bezrukov
+# Copyright (C) 2011-2014 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '3.2.0'
+INVOICES_VERSION_NUMBER = '3.2.3'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do
@@ -31,7 +31,7 @@ Redmine::Plugin.register :redmine_contacts_invoices do
   requires_redmine :version_or_higher => '2.3'
 
   begin
-    requires_redmine_plugin :redmine_contacts, :version_or_higher => '3.4.1'
+    requires_redmine_plugin :redmine_contacts, :version_or_higher => '3.4.3'
   rescue Redmine::PluginNotFound  => e
     raise "Please install redmine_contacts plugin"
   end

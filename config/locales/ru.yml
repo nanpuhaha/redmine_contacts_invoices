@@ -195,3 +195,13 @@ ru:
 
   #3.1.4
   label_invoice_download_as_pdf: Загрузить как PDF
+
+  #3.2.0
+  label_invoice_amount_paid: Оплаченная сумма
+  label_invoices_copy_to_all: Копировать для всех
+
+  #3.2.2
+  permission_manage_public_expenses_queries: Управление общими запросами для расходов
+  permission_save_expenses_queries: Сохранение запросов для расходов
+  permission_manage_public_invoices_queries: Управление общими запросами для счетов
+  permission_save_invoices_queries: Сохранение запросов для счетов
