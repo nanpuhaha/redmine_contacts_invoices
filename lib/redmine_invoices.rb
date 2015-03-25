@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-Rails.configuration.to_prepare do
-
-  require 'redmine_invoices/hooks/views_layouts_hook'
-  require 'redmine_invoices/hooks/controller_contacts_duplicates_hook'
-  require 'redmine_invoices/patches/application_helper_patch'
-  require 'redmine_invoices/patches/queries_helper_patch'
-  require 'redmine_invoices/patches/project_patch'
-  require 'redmine_invoices/patches/contact_patch'
-  require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
-end
-
 require 'reports/invoice_reports'
+
+require 'redmine_invoices/hooks/views_layouts_hook'
+require 'redmine_invoices/hooks/controller_contacts_duplicates_hook'
+require 'redmine_invoices/patches/application_helper_patch'
+require 'redmine_invoices/patches/queries_helper_patch'
+require 'redmine_invoices/patches/project_patch'
+require 'redmine_invoices/patches/contact_patch'
+require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
+
 
 require 'redmine_invoices/liquid/invoices'
 
@@ -45,6 +43,10 @@ class InvoicesSettings
   def self.disable_taxes?(project_id = nil)
     contacts_setting = ContactsSetting["disable_taxes", project_id]
     contacts_setting.blank? ? ContactsSetting.disable_taxes? : contacts_setting.to_i > 0
+  end
+
+  def self.paypal_enabled?(project_id = nil)
+    self['invoices_paypal_enabled', project_id]
   end
 
   def self.total_including_tax?
@@ -96,6 +98,9 @@ class InvoicesSettings
     @@products_plugin_installed ||= (Redmine::Plugin.installed?(:redmine_products) && Redmine::Plugin.find(:redmine_products).version >= "1.0.3" )
   end
 
+  def self.per_invoice_templates?
+    Setting.plugin_redmine_contacts_invoices["per_invoice_templates"].to_i > 0
+  end
 
 end
 

@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -98,7 +98,6 @@ class InvoicesController < ApplicationController
   end
 
   def show
-
     @invoice_lines = @invoice.lines || []
     @payments = @invoice.payments
     @comments = @invoice.comments

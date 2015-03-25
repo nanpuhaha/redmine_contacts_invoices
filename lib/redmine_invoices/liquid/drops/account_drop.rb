@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 class AccountDrop < Liquid::Drop
+  include Redmine::I18n
 
   def initialize(project)
     @project = project
@@ -41,6 +42,10 @@ class AccountDrop < Liquid::Drop
 
   def logo
     InvoicesSettings[:invoices_company_logo_url, @project]
+  end
+
+  def language
+    current_language.to_s
   end
 
   private

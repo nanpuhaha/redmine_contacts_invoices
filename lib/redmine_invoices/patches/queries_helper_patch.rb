@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -42,9 +42,7 @@ module RedmineInvoices
             format_date(list_object.invoice_date)
           elsif column.name == :due_date && list_object.is_a?(Invoice)
             format_date(list_object.due_date)
-          elsif column.name == :expense_date && list_object.is_a?(Expense)
-            link_to format_date(list_object.expense_date), edit_expense_path(list_object)
-          elsif [:amount, :price].include?(column.name) && (list_object.is_a?(Invoice) || list_object.is_a?(Expense))
+          elsif [:amount, :price].include?(column.name) && list_object.is_a?(Invoice)
             list_object.send("#{column.name.to_s}_to_s")
           elsif [:balance, :remaining_balance].include?(column.name) && list_object.is_a?(Invoice)
             list_object.send("#{column.name.to_s}_to_s") if (list_object.is_paid? || list_object.is_sent?)

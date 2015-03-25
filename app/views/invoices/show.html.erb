@@ -11,7 +11,7 @@
 
 <div class="issue invoice details">
   <div class="subject">
-    <h3><%= "#{@invoice.contact.name + ' - ' if @invoice.contact}#{@invoice.amount_to_s}#{' - ' + @invoice.subject unless @invoice.subject.blank?}" %></h3>
+    <h3><%= "#{@invoice.contact.name + ' - ' if @invoice.contact}#{price_to_currency(@invoice.amount, @invoice.currency, :converted => false)}#{' - ' + @invoice.subject unless @invoice.subject.blank?}" %></h3>
   </div>
 
   <p class="author">

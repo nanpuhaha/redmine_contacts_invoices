@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -20,15 +20,14 @@
 module RedmineInvoices
   module Patches
     module ContactPatch
-      def self.included(base) # :nodoc: 
+      def self.included(base) # :nodoc:
         base.send(:include, InstanceMethods)
 
-        base.class_eval do    
+        base.class_eval do
           unloadable # Send unloadable so it will not be unloaded in development
-          has_many :invoices, :dependent => :nullify 
-          has_many :expenses, :dependent => :nullify 
-        end  
-      end  
+          has_many :invoices, :dependent => :nullify
+        end
+      end
 
       module InstanceMethods
         # Adds a rates tab to the user administration page
@@ -36,7 +35,7 @@ module RedmineInvoices
           scope = self.invoices.visible
           scope = scope.visible
           scope = scope.scoped(:conditions => ["#{Invoice.table_name}.contact_id = ?", self.id]) unless self.blank?
-          scope.sent_or_paid.sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance", :group => :currency)          
+          scope.sent_or_paid.sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance", :group => :currency)
         end
       end
 

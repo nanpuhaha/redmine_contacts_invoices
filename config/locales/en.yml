@@ -28,7 +28,7 @@ en:
   label_invoice_add_line: Add line
   label_invoice_overdue: Overdue
   label_invoice_last_number: 'Last invoice number was #%{number}'
-  label_invoice_template: Template
+  label_invoice_template: Invoice template
   label_invoice_number_format: Invoice number format
   label_invoice_default_tax: Default tax value
   label_invoice_line_grouping: Lines grouping
@@ -167,7 +167,7 @@ en:
   label_estimate: Estimate
 
   #3.0.0
-  label_invoice_templates: Templates
+  label_invoice_templates: Invoice templates
   label_invoice_custom_template: Invoice custom template
   label_invoice_pdf: PDF
   label_invoice_public_link: Public link
@@ -207,3 +207,14 @@ en:
   permission_manage_public_expenses_queries: Manage public expenses queries
   permission_save_invoices_queries: Save invoices queries
   permission_manage_public_invoices_queries: Manage public invoices queries
+
+  #3.2.3
+  label_invoice_print: Print
+  label_invoice_new_template: New invoice template
+  label_invoice_template_custom_plural: Custom templates
+  label_invoice_per_invoice_templates: Per invoice templates
+
+  label_invoice_online_payments: Online payments
+  label_invoice_paypal_enabled: Paypal
+  label_invoice_pay_online: Pay online
+  label_invoice_amount_due: Amount Due

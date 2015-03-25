@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-module RedmineInvoices
-  module Hooks
-    class ViewsContextMenuesHook < Redmine::Hook::ViewListener     
-      render_on :view_contacts_context_menu_before_delete, :partial => "context_menus/invoices_contacts" 
-    end   
+class AddTemplateIdToInvoices < ActiveRecord::Migration
+  def change
+    add_column :invoices, :template_id, :integer
   end
 end

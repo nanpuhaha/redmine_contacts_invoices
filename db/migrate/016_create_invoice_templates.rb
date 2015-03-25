@@ -17,10 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-module RedmineInvoices
-  module Hooks
-    class ViewsContextMenuesHook < Redmine::Hook::ViewListener     
-      render_on :view_contacts_context_menu_before_delete, :partial => "context_menus/invoices_contacts" 
-    end   
+class CreateInvoiceTemplates < ActiveRecord::Migration
+  def change
+    create_table :invoice_templates do |t|
+      t.string :name
+      t.references :project
+      t.text :content
+      t.string :description
+      t.references :author
+      t.timestamps
+    end
   end
 end

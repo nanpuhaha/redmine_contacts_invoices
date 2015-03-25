@@ -84,7 +84,7 @@ table.invoice-lines td.description {text-align: left;width: 70%;white-space: nor
 table.invoice-lines td.quantity {text-align: center;}
 table.invoice-lines td.units {text-align: center;}
 table.invoice-lines td.price {text-align: right}
-table.invoice-lines td.tax {text-align: center;;width: 1px;}
+table.invoice-lines td.tax {text-align: center;width: 1px;}
 table.invoice-lines td.tax_amount {text-align: right;}
 table.invoice-lines td.total_price {text-align: right;}
 table.invoice-lines tr.total th {
@@ -229,3 +229,12 @@ span.expense-status.billed {background-color: #F7AA3F;}
 span.expense-status.paid {background-color: green;}
 
 div.issue.expense table.progress td.closed { background: #F99 none repeat scroll 0%;}
+
+/**********************************************************************/
+/* TOOLBAR FOR PUBLIC LINK
+/**********************************************************************/
+div.pdf-toolbar { font-family: 'Lucida Grande', Helvetica, Arial, 'Sans-Serif'; }
+div.pdf-toolbar .buttons { float:right; margin-top: 10px; }
+div.pdf-toolbar .buttons form { display: inline; }
+div.pdf-toolbar .due-amount .small-text { margin-bottom: -1px; font-size: 11px; color: #666666; }
+div.pdf-toolbar .due-amount .amount { font-weight: bold; font-size: 20px; }

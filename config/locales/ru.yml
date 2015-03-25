@@ -205,3 +205,8 @@ ru:
   permission_save_expenses_queries: Сохранение запросов для расходов
   permission_manage_public_invoices_queries: Управление общими запросами для счетов
   permission_save_invoices_queries: Сохранение запросов для счетов
+
+  label_invoice_online_payments: Электронные платежи
+  label_invoice_paypal_enabled: PayPal
+  label_invoice_pay_online: Оплатить online
+  label_invoice_amount_due: К оплате

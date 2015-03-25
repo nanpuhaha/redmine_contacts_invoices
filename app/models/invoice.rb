@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :project
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
   belongs_to :assigned_to, :class_name => "User", :foreign_key => "assigned_to_id"
+  belongs_to :template, :class_name => "InvoiceTemplate"
   has_many :lines, :class_name => "InvoiceLine", :foreign_key => "invoice_id", :order => "position", :dependent => :delete_all
   has_many :comments, :as => :commented, :dependent => :delete_all, :order => "created_on"
   has_many :payments, :class_name => "InvoicePayment", :dependent => :delete_all, :order => "payment_date"

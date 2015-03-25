@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -20,13 +20,12 @@
 module RedmineInvoices
   module Patches
     module ProjectPatch
-      def self.included(base) # :nodoc: 
-        base.class_eval do    
+      def self.included(base) # :nodoc:
+        base.class_eval do
           unloadable # Send unloadable so it will not be unloaded in development
-          has_many :invoices, :dependent => :destroy 
-          has_many :expenses, :dependent => :destroy 
-        end  
-      end  
+          has_many :invoices, :dependent => :destroy
+        end
+      end
     end
   end
 end

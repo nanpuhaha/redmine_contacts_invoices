@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ module RedmineInvoices
     class ControllerContactsDuplicatesHook < Redmine::Hook::ViewListener
       def controller_contacts_duplicates_merge(context={})
         context[:duplicate].invoices << context[:contact].invoices
-        context[:duplicate].expenses << context[:contact].expenses
       end
     end
   end

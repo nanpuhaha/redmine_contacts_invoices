@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -39,8 +39,13 @@ module RedmineInvoices
 
           tabs.push({ :name => 'invoices',
             :action => :manage_invoices,
-            :partial => 'projects/invoices_settings',
+            :partial => 'projects/settings/invoices_settings',
             :label => :label_invoice_plural }) if User.current.allowed_to?(:manage_invoices, @project)
+
+          tabs.push({ :name => 'invoice_templates',
+            :action => :manage_invoices,
+            :partial => 'projects/settings/invoice_templates',
+            :label => :label_invoice_templates }) if User.current.allowed_to?(:manage_invoices, @project)
 
           tabs
 

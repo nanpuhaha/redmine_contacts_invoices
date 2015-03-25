@@ -1,8 +1,16 @@
 == Redmine Invoices plugin changelog
 
 Redmine Invoices plugin - invoicing plugin for Redmine
-Copyright (C) 2011-2013 Kirill Bezrukov
+Copyright (C) 2011-2015 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
+
+== 2015-03-25 v3.3.0
+
+* Print button for public links
+* Multiple custom templates per project
+* Invoice template field
+* PayPal online payments
+* Chinese translation (zhoutt)
 
 == 2014-11-14 v3.2.3
 

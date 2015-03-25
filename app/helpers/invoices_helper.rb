@@ -3,7 +3,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2014 Kirill Bezrukov
+# Copyright (C) 2011-2015 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -96,14 +96,6 @@ module InvoicesHelper
 
   def invoice_avaliable_locales_hash
     Hash[*invoice_lang_options_for_select.collect{|k, v| [v.blank? ? "default" : v, k]}.flatten]
-  end
-
-  def collection_invoice_templates_for_select
-    [[l(:label_invoice_template_classic), RedmineInvoices::TEMPLATE_CLASSIC ],
-     [l(:label_invoice_template_modern), RedmineInvoices::TEMPLATE_MODERN ],
-     [l(:label_invoice_template_left), RedmineInvoices::TEMPLATE_MODERN_LEFT ],
-     [l(:label_invoice_template_blank_header), RedmineInvoices::TEMPLATE_BLANK_HEADER ],
-     [l(:label_invoice_template_custom), RedmineInvoices::TEMPLATE_CUSTOM ]]
   end
 
   def collection_invoice_status_names
