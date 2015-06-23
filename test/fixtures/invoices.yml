@@ -34,3 +34,4 @@ three:
   due_date: <%= Date.today - 5 %>
   invoice_date: <%= 7.days.ago.to_s(:db) %>
   project_id: 2
+  template_id: 1

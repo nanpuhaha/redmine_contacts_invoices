@@ -35,6 +35,7 @@ class InvoiceMailsController < ApplicationController
       params[:message] = invoice_mail_macro(@invoice, params[:"message-content"])
       params[:subject] = invoice_mail_macro(@invoice, params[:subject])
       delivered = InvoicesMailer.invoice(@invoice, params).deliver
+      @invoice.update_attributes(:status_id => Invoice::SENT_INVOICE) if delivered && params[:mark_as_sent]
     rescue Exception => e
       flash[:error] = l(:notice_email_error, e.message)
     end
@@ -51,7 +52,7 @@ class InvoiceMailsController < ApplicationController
 private
 
   def find_invoice
-    @invoice = Invoice.find(params[:invoice_id], :include => [:project, :contact])
+    @invoice = Invoice.eager_load([:project, :contact]).find(params[:invoice_id])
     @project ||= @invoice.project
   rescue ActiveRecord::RecordNotFound
     render_404

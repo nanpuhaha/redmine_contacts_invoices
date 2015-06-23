@@ -20,6 +20,8 @@
 class InvoiceLine < ActiveRecord::Base
   unloadable
 
+  attr_accessible :description, :price, :quantity, :tax
+
   belongs_to :invoice
 
   validates_presence_of :description, :price, :quantity

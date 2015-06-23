@@ -33,9 +33,9 @@ class CreateInvoicesAndExpenses < ActiveRecord::Migration
       t.integer :project_id
       t.integer :assigned_to_id
       t.integer :author_id
-      t.timestamps
+      t.timestamps :null => false
     end
-    add_index :invoices, :contact_id 
+    add_index :invoices, :contact_id
     add_index :invoices, :project_id
     add_index :invoices, :status_id
     add_index :invoices, :assigned_to_id
@@ -49,15 +49,16 @@ class CreateInvoicesAndExpenses < ActiveRecord::Migration
       t.integer :author_id
       t.integer :project_id
       t.integer :status_id
-      t.timestamps
+      t.timestamps :null => false
     end
-    add_index :expenses, :contact_id 
+    add_index :expenses, :contact_id
     add_index :expenses, :project_id
     add_index :expenses, :status_id
-    add_index :expenses, :author_id    
+    add_index :expenses, :author_id
   end
 
   def self.down
+    drop_table :expenses
     drop_table :invoices
   end
 end

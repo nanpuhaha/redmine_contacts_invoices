@@ -20,6 +20,8 @@
 class InvoicePayment < ActiveRecord::Base
   unloadable
 
+  attr_accessible :amount, :payment_date, :description
+
   belongs_to :invoice
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
 
@@ -35,11 +37,19 @@ class InvoicePayment < ActiveRecord::Base
                 :title => Proc.new {|o| "#{l(:label_invoice_payment_created)} #{format_date(o.payment_date)} - #{o.amount.to_s}" },
                 :description => Proc.new {|o| [format_date(o.payment_date), o.description.to_s, o.invoice.blank? ? "" : o.invoice.number].join(' ') }
 
-  acts_as_activity_provider :type => 'invoices',
-                            :permission => :view_invoices,
-                            :timestamp => "#{table_name}.created_at",
-                            :author_key => :author_id,
-                            :find_options => {:include => {:invoice => :project}}
+  if ActiveRecord::VERSION::MAJOR >= 4
+    acts_as_activity_provider :type => 'invoices',
+                              :permission => :view_invoices,
+                              :timestamp => "#{table_name}.created_at",
+                              :author_key => :author_id,
+                              :scope => joins({:invoice => :project})
+  else
+    acts_as_activity_provider :type => 'invoices',
+                              :permission => :view_invoices,
+                              :timestamp => "#{table_name}.created_at",
+                              :author_key => :author_id,
+                              :find_options => {:include => {:invoice => :project}}
+  end
 
   acts_as_customizable
   acts_as_attachable :view_permission => :view_invoices,

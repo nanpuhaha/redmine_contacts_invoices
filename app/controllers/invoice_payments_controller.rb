@@ -81,7 +81,7 @@ class InvoicePaymentsController < ApplicationController
   end
 
   def find_invoice_payment
-    @invoice_payment = InvoicePayment.find(params[:id], :include => {:invoice => :project})
+    @invoice_payment = InvoicePayment.joins({:invoice => :project}).find(params[:id])
     @project ||= @invoice_payment.project
     @invoice ||= @invoice_payment.invoice
   rescue ActiveRecord::RecordNotFound

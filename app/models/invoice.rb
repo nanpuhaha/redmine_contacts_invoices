@@ -37,38 +37,52 @@ class Invoice < ActiveRecord::Base
   has_many :payments, :class_name => "InvoicePayment", :dependent => :delete_all, :order => "payment_date"
 
   scope :by_project, lambda {|project_id| where(["#{Invoice.table_name}.project_id = ?", project_id]) unless project_id.blank? }
+  scope :visible, lambda {|*args| eager_load(:project).where(Project.allowed_to_condition(args.first || User.current, :view_invoices)) }
+  scope :live_search, lambda { |search| where("(LOWER(#{Invoice.table_name}.number) LIKE ? OR
+                                                LOWER(#{Invoice.table_name}.subject) LIKE ? OR
+                                                LOWER(#{Invoice.table_name}.description) LIKE ?)",
+                                                "%" + search.downcase + "%",
+                                                "%" + search.downcase + "%",
+                                                "%" + search.downcase + "%") }
 
+  scope :paid, lambda { where(:status_id => PAID_INVOICE) }
+  scope :sent_or_paid, lambda { where(["#{Invoice.table_name}.status_id = ? OR #{Invoice.table_name}.status_id = ?", PAID_INVOICE, SENT_INVOICE]) }
+  scope :open, lambda { where(["#{Invoice.table_name}.status_id <> ? AND #{Invoice.table_name}.status_id <> ?", PAID_INVOICE, CANCELED_INVOICE]) }
 
-  scope :visible, lambda {|*args| { :include => :project,
-                                          :conditions => Project.allowed_to_condition(args.first || User.current, :view_invoices)} }
-  scope :live_search, lambda {|search| {:conditions =>   ["(LOWER(#{Invoice.table_name}.number) LIKE ? OR
-                                                                  LOWER(#{Invoice.table_name}.subject) LIKE ? OR
-                                                                  LOWER(#{Invoice.table_name}.description) LIKE ?)",
-                                                                 "%" + search.downcase + "%",
-                                                                 "%" + search.downcase + "%",
-                                                                 "%" + search.downcase + "%"] }}
-  scope :paid, where(:status_id => PAID_INVOICE)
-  scope :sent_or_paid, where(["#{Invoice.table_name}.status_id = ? OR #{Invoice.table_name}.status_id = ?", PAID_INVOICE, SENT_INVOICE])
-  scope :open, where(["#{Invoice.table_name}.status_id <> ? AND #{Invoice.table_name}.status_id <> ?", PAID_INVOICE, CANCELED_INVOICE])
+  if ActiveRecord::VERSION::MAJOR >= 4
+    acts_as_activity_provider :type => 'invoices',
+                              :permission => :view_invoices,
+                              :timestamp => "#{table_name}.created_at",
+                              :author_key => :author_id,
+                              :scope => joins(:project)
+
+    acts_as_searchable :columns => ["#{table_name}.number"],
+                       :scope => joins(:project),
+                       :project_key => "#{Project.table_name}.id",
+                       :permission => :view_invoices,
+                       # sort by id so that limited eager loading doesn't break with postgresql
+                       :date_column => "number"
+  else
+    acts_as_activity_provider :type => 'invoices',
+                              :permission => :view_invoices,
+                              :timestamp => "#{table_name}.created_at",
+                              :author_key => :author_id,
+                              :find_options => {:include => :project}
+
+    acts_as_searchable :columns => ["#{table_name}.number"],
+                       :date_column => "#{table_name}.created_at",
+                       :include => [:project],
+                       :project_key => "#{Project.table_name}.id",
+                       :permission => :view_invoices,
+                       # sort by id so that limited eager loading doesn't break with postgresql
+                       :order_column => "#{table_name}.number"
+  end
 
   acts_as_event :datetime => :created_at,
                 :url => Proc.new {|o| {:controller => 'invoices', :action => 'show', :id => o}},
                 :type => 'icon-invoice',
                 :title => Proc.new {|o| "#{l(:label_invoice_created)} ##{o.number} (#{o.status}): #{o.currency + ' ' if o.currency}#{o.amount}" },
                 :description => Proc.new {|o| [o.number, o.contact ? o.contact.name : '', o.currency.to_s + " " + o.amount.to_s, o.description].join(' ') }
-
-  acts_as_activity_provider :type => 'invoices',
-                            :permission => :view_invoices,
-                            :timestamp => "#{table_name}.created_at",
-                            :author_key => :author_id,
-                            :find_options => {:include => :project}
-  acts_as_searchable :columns => ["#{table_name}.number"],
-                     :date_column => "#{table_name}.created_at",
-                     :include => [:project],
-                     :project_key => "#{Project.table_name}.id",
-                     :permission => :view_invoices,
-                     # sort by id so that limited eager loading doesn't break with postgresql
-                     :order_column => "#{table_name}.number"
 
   acts_as_watchable
   acts_as_attachable
@@ -112,12 +126,16 @@ class Invoice < ActiveRecord::Base
   end
 
   def calculate_balance
-    payments_sum = self.payments.sum(&:amount)
+    payments_sum = self.payments.to_a.sum(&:amount)
     self.balance = payments_sum > self.amount ? self.amount : payments_sum
   end
 
   def calculate_amount
-    self.amount = self.subtotal + (ContactsSetting.tax_exclusive? ? self.tax_amount : 0) - discount_amount
+    self.amount = self.subtotal + (ContactsSetting.tax_exclusive? ? self.tax_amount : 0)
+    if InvoicesSettings.discount_after_tax?
+      self.amount -=  discount_amount
+    end
+    self.amount.to_f
   end
   alias_method :calculate, :calculate_amount
 
@@ -126,11 +144,23 @@ class Invoice < ActiveRecord::Base
   end
 
   def subtotal
-    self.lines.inject(0){|sum,x| sum + x.total}.to_f
+    if InvoicesSettings.discount_after_tax?
+      self.lines.inject(0){|sum,x| sum + x.total}.to_f
+    else
+      self.lines.inject(0) do |sum,x|
+        sum + (x.total - (x.total * (discount / 100)).to_f )
+      end.to_f
+    end
   end
 
   def discount_amount
-    (discount / 100) * (InvoicesSettings.discount_after_tax? ? subtotal + tax_amount : subtotal)
+    if InvoicesSettings.discount_after_tax?
+      self.lines.inject(0){|sum,x| sum + x.total + x.tax_amount}.to_f * (discount / 100)
+    else
+      self.lines.inject(0) do |sum,x|
+        sum + (x.total * (discount / 100)).to_f
+      end.to_f
+    end
   end
 
   def discount_rate
@@ -177,7 +207,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def self.allowed_target_projects(user=User.current)
-    Project.all(:conditions => Project.allowed_to_condition(user, :edit_invoices))
+    Project.where(Project.allowed_to_condition(user, :edit_invoices))
   end
 
   STATUSES = {
@@ -259,22 +289,22 @@ class Invoice < ActiveRecord::Base
 
   def self.sum_by_period(peroid, project, contact_id=nil)
     from, to = RedmineContacts::DateUtils.retrieve_date_range(peroid)
-    scope = Invoice.scoped({})
+    scope = Invoice.where({})
     scope = scope.visible
     scope = scope.by_project(project.id) if project
     scope = scope.where("#{Invoice.table_name}.invoice_date >= ? AND #{Invoice.table_name}.invoice_date < ?", from, to)
     scope = scope.where("#{Invoice.table_name}.contact_id = ?", contact_id) unless contact_id.blank?
     scope = scope.sent_or_paid
-    scope.sum(:amount, :group => :currency)
+    scope.group(:currency).sum(:amount)
   end
 
   def self.sum_by_status(status_id, project, contact_id=nil)
-    scope = Invoice.scoped({})
+    scope = Invoice.where({})
     scope = scope.visible
     scope = scope.by_project(project.id) if project
     scope = scope.where("#{Invoice.table_name}.status_id = ?", status_id)
     scope = scope.where("#{Invoice.table_name}.contact_id = ?", contact_id) unless contact_id.blank?
-    [scope.sum(:amount, :group => :currency), scope.count(:number)]
+    [scope.group(:currency).sum(:amount), scope.count(:number)]
   end
 
   def copy_from_object(copy_from_object, options={})

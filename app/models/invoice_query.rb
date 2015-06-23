@@ -18,7 +18,7 @@
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 class InvoiceQuery < CrmQuery
-  include RedmineContacts::MoneyHelper
+  include RedmineCrm::MoneyHelper
   include InvoicesHelper
 
   self.queried_class = Invoice
@@ -100,7 +100,7 @@ class InvoiceQuery < CrmQuery
     when "c"
       sql = "#{queried_table_name}.status_id IN (#{Invoice::PAID_INVOICE}, #{Invoice::CANCELED_INVOICE})"
     when "d"
-      "#{Invoice.table_name}.due_date <= '#{connection.quoted_date(Date.today)}' AND #{Invoice.table_name}.status_id = #{Invoice::SENT_INVOICE}"
+      "#{Invoice.table_name}.due_date <= '#{ActiveRecord::VERSION::MAJOR >= 4 ? self.class.connection.quoted_date(Date.today) : connection.quoted_date(Date.today)}' AND #{Invoice.table_name}.status_id = #{Invoice::SENT_INVOICE}"
     else
       sql_for_field(field, operator, value, queried_table_name, field)
     end
@@ -109,23 +109,23 @@ class InvoiceQuery < CrmQuery
   def sql_for_due_amount_field(field, operator, value)
     sql_for_field(field, operator, value, Invoice.table_name, "amount - #{Invoice.table_name}.balance") +
       " AND #{Invoice.table_name}.status_id IN (#{Invoice::SENT_INVOICE}, #{Invoice::PAID_INVOICE})" +
-      " AND #{Invoice.table_name}.due_date <= '#{connection.quoted_date(Date.today)}' "
+      " AND #{Invoice.table_name}.due_date <= '#{ActiveRecord::VERSION::MAJOR >= 4 ? self.class.connection.quoted_date(Date.today) : connection.quoted_date(Date.today)}' "
   end
 
   def invoiced_amount
-    objects_scope.sum(:amount, :group => "#{Invoice.table_name}.currency")
+    objects_scope.group("#{Invoice.table_name}.currency").sum(:amount)
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
 
   def paid_amount
-    objects_scope.sent_or_paid.sum(:balance, :group => :currency)
+    objects_scope.sent_or_paid.group(:currency).sum(:balance)
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
 
   def due_amount
-    objects_scope.sent_or_paid.sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance", :group => :currency)
+    objects_scope.sent_or_paid.group(:currency).sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance")
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end

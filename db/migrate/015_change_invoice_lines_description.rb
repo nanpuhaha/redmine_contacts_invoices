@@ -18,7 +18,11 @@
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 class ChangeInvoiceLinesDescription < ActiveRecord::Migration
-  def change
+  def up
     change_column :invoice_lines, :description, :text
+  end
+
+  def down
+    change_column :invoice_lines, :description, :string
   end
 end

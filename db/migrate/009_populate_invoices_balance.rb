@@ -23,6 +23,9 @@ class PopulateInvoicesBalance < ActiveRecord::Migration
       invoice.payments.create(:payment_date => invoice.invoice_date, :amount => invoice.amount)
     end
   end
+
+  def down
+  end
 end
 
 InvoiceLine.send(:define_method, :discount){ 0 }

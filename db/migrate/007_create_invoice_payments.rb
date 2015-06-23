@@ -25,8 +25,8 @@ class CreateInvoicePayments < ActiveRecord::Migration
       t.references :invoice
       t.string :description
       t.references :author
-      t.timestamps
+      t.timestamps :null => false
     end
-    add_index :invoice_payments, :invoice_id 
+    add_index :invoice_payments, :invoice_id
   end
 end

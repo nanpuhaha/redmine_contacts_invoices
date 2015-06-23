@@ -66,7 +66,6 @@ class InvoiceDrop < Liquid::Drop
            :is_paid?,
            :is_sent?,
            :has_taxes?,
-           :project,
            :status,
            :language,
            :currency,
@@ -82,6 +81,10 @@ class InvoiceDrop < Liquid::Drop
 
   def discount
     @invoice.discount_amount
+  end
+
+  def project
+    @invoice.project.name
   end
 
   def lines

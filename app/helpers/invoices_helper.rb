@@ -24,7 +24,7 @@ module InvoicesHelper
   include Redmine::I18n
 
   def invoices_contacts_for_select(project, options={})
-    scope = Contact.scoped({})
+    scope = Contact.where({})
     scope = scope.joins(:projects).uniq.where(Contact.visible_condition(User.current))
     scope = scope.joins(:invoices)
     scope = scope.where("(#{Project.table_name}.id <> -1)")
@@ -64,7 +64,7 @@ module InvoicesHelper
 
   def contact_custom_fields
     if "ContactCustomField".is_a_defined_class?
-      ContactCustomField.find(:all, :conditions => ["#{ContactCustomField.table_name}.field_format = 'string' OR #{ContactCustomField.table_name}.field_format = 'text'"]).map{|f| [f.name, f.id.to_s]}
+      ContactCustomField.where("#{ContactCustomField.table_name}.field_format = 'string' OR #{ContactCustomField.table_name}.field_format = 'text'").map{|f| [f.name, f.id.to_s]}
     else
       []
     end

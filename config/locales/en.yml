@@ -218,3 +218,4 @@ en:
   label_invoice_paypal_enabled: Paypal
   label_invoice_pay_online: Pay online
   label_invoice_amount_due: Amount Due
+  field_invoice_sent_flag: Mark as Sent

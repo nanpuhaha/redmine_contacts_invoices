@@ -210,3 +210,4 @@ ru:
   label_invoice_paypal_enabled: PayPal
   label_invoice_pay_online: Оплатить online
   label_invoice_amount_due: К оплате
+  field_invoice_sent_flag: Отметить как выставленный

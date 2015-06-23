@@ -34,8 +34,8 @@ module RedmineInvoices
         def invoices_balance
           scope = self.invoices.visible
           scope = scope.visible
-          scope = scope.scoped(:conditions => ["#{Invoice.table_name}.contact_id = ?", self.id]) unless self.blank?
-          scope.sent_or_paid.sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance", :group => :currency)
+          scope = scope.where(["#{Invoice.table_name}.contact_id = ?", self.id]) unless self.blank?
+          scope.sent_or_paid.group(:currency).sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance")
         end
       end
 

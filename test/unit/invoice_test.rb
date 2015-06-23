@@ -22,6 +22,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class InvoiceTest < ActiveSupport::TestCase
+  include RedmineInvoices::TestCase::TestHelper
   fixtures :projects,
            :users,
            :roles,
@@ -46,19 +47,16 @@ class InvoiceTest < ActiveSupport::TestCase
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
-                            [:contacts,
-                             :contacts_projects])
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', [:contacts,
+                                                                                                                    :contacts_projects])
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
-                          [:invoices,
-                           :invoice_lines])
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', [:invoices,
+                                                                                                                             :invoice_lines])
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_products).directory + '/test/fixtures/',
-                      [:products,
-                       :order_statuses,
-                       :orders,
-                       :product_lines]) if InvoicesSettings.products_plugin_installed?
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_products).directory + '/test/fixtures/', [:products,
+                                                                                                                    :order_statuses,
+                                                                                                                    :orders,
+                                                                                                                    :product_lines]) if InvoicesSettings.products_plugin_installed?
 
   def setup
     @project_a = Project.create(:name => "Test_a", :identifier => "testa")
@@ -116,31 +114,33 @@ class InvoiceTest < ActiveSupport::TestCase
   end
 
   def test_discount_after_tax
-    RedmineInvoices.settings["invoices_discount_after_tax"] = 1
-    @invoice1.discount_type = 0 #percent
-    @invoice1.discount = 10
-    @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
-    @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000)
-    assert @invoice1.save
-    assert_equal 2000.00, @invoice1.subtotal
-    assert_equal 200.00, @invoice1.tax_amount
-    assert_equal 200.00, @invoice1.tax_groups.first[1]
-    assert_equal 220.00, @invoice1.discount_amount
-    assert_equal 1980.00, @invoice1.amount
+    with_invoice_settings 'invoices_discount_after_tax' => 1 do
+      @invoice1.discount_type = 0 #percent
+      @invoice1.discount = 10
+      @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
+      @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000, :tax => 10)
+      assert @invoice1.save
+      assert_equal 2000.00, @invoice1.subtotal
+      assert_equal 300.00, @invoice1.tax_amount
+      assert_equal [100.00, 200.00], @invoice1.tax_groups.map{|t| t[1]}.sort
+      assert_equal 230.00, @invoice1.discount_amount
+      assert_equal 2070.00, @invoice1.amount
+    end
   end
 
-  def test_discount_before_tax
-    RedmineInvoices.settings["invoices_discount_after_tax"] = 0
-    @invoice1.discount_type = 0 #percent
-    @invoice1.discount = 10
-    @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
-    @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000)
-    assert @invoice1.save
-    assert_equal 2000.00, @invoice1.subtotal
-    assert_equal 180.00, @invoice1.tax_amount
-    assert_equal 180.00, @invoice1.tax_groups.first[1]
-    assert_equal 200.00, @invoice1.discount_amount
-    assert_equal 1980.00, @invoice1.amount
+  def test_discount_after_tax_disbaled
+    with_invoice_settings 'invoices_discount_after_tax' => 0 do
+      @invoice1.discount_type = 0 #percent
+      @invoice1.discount = 10
+      @invoice1.lines.new(:description => "Line 1", :quantity => 1, :price => 1000, :tax => 20)
+      @invoice1.lines.new(:description => "Line 2", :quantity => 1, :price => 1000, :tax => 10)
+      assert @invoice1.save
+      assert_equal 1800.00, @invoice1.subtotal
+      assert_equal 270.00, @invoice1.tax_amount
+      assert_equal [90.00, 180.00], @invoice1.tax_groups.map{|t| t[1]}.sort
+      assert_equal 200.00, @invoice1.discount_amount
+      assert_equal 2070.00, @invoice1.amount
+    end
   end
 
   def test_copy_from_object

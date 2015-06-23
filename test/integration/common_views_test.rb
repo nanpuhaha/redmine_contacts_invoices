@@ -22,7 +22,8 @@
 require File.expand_path('../../test_helper', __FILE__)
 require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
-class RedmineInvoices::CommonViewsTest < ActionController::IntegrationTest
+class RedmineInvoices::CommonViewsTest < ActiveRecord::VERSION::MAJOR >= 4 ? Redmine::ApiTest::Base : ActionController::IntegrationTest
+  include RedmineInvoices::TestCase::TestHelper
   fixtures :projects,
            :users,
            :roles,
@@ -47,18 +48,18 @@ class RedmineInvoices::CommonViewsTest < ActionController::IntegrationTest
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
-                            [:contacts,
-                             :contacts_projects,
-                             :contacts_issues,
-                             :deals,
-                             :notes,
-                             :tags,
-                             :taggings])
+  fixtures :email_addresses if ActiveRecord::VERSION::MAJOR >= 4
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
-                          [:invoices,
-                           :invoice_lines])
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', [:contacts,
+                                                                                                                    :contacts_projects,
+                                                                                                                    :contacts_issues,
+                                                                                                                    :deals,
+                                                                                                                    :notes,
+                                                                                                                    :tags,
+                                                                                                                    :taggings])
+
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', [:invoices,
+                                                                                                                             :invoice_lines])
 
   def setup
     RedmineInvoices::TestCase.prepare
@@ -66,30 +67,47 @@ class RedmineInvoices::CommonViewsTest < ActionController::IntegrationTest
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @request.env['HTTP_REFERER'] = '/'
+    @stub_settings = { 'invoices_company_name' => 'Your company name',
+                       'invoices_company_representative' => 'Company representative name',
+                       'invoices_template' => 'classic',
+                       'invoices_cross_project_contacts'=> 1,
+                       'invoices_number_format' => '#INV/%%YEAR%%%%MONTH%%%%DAY%%-%%ID%%',
+                       'invoices_company_info' => "Your company address\nTax ID\nphone:\nfax:",
+                       'invoices_company_logo_url' => "http://www.redmine.org/attachments/3458/redmine_logo_v1.png",
+                       'invoices_bill_info' => "Your billing information (Bank, Address, IBAN, SWIFT & etc.)",
+                       'invoices_units' => "hours\ndays\nservice\nproducts" }
   end
 
   test "View invoices activity" do
-    log_user("admin", "admin")
-    get "/projects/ecookbook/activity?show_invoices=1"
-    assert_response :success
+    with_invoice_settings @stub_settings do
+      log_user("admin", "admin")
+      get "/projects/ecookbook/activity?show_invoices=1"
+      assert_response :success
+    end
   end
 
   test "View invoices settings" do
-    log_user("admin", "admin")
-    get "/settings/plugin/redmine_contacts_invoices"
-    assert_response :success
+    with_invoice_settings @stub_settings do
+      log_user("admin", "admin")
+      get "/settings/plugin/redmine_contacts_invoices"
+      assert_response :success
+    end
   end
 
   test "View invoices project settings" do
-    log_user("admin", "admin")
-    get "/projects/ecookbook/settings/invoices"
-    assert_response :success
+    with_invoice_settings @stub_settings do
+      log_user("admin", "admin")
+      get "/projects/ecookbook/settings/invoices"
+      assert_response :success
+    end
   end
 
   test "Global search with invoices" do
-    log_user("admin", "admin")
-    get "/search?q=INV"
-    assert_response :success
+    with_invoice_settings @stub_settings do
+      log_user("admin", "admin")
+      get "/search?q=INV"
+      assert_response :success
+    end
   end
 
 

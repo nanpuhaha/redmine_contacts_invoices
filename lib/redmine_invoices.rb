@@ -61,11 +61,19 @@ class InvoicesSettings
      Setting.plugin_redmine_contacts_invoices["invoices_discount_after_tax"].to_i > 0
   end
 
+  def self.use_current_user_email?
+    Setting.plugin_redmine_contacts_invoices["invoices_email_current_user"].to_i > 0
+  end
+
+  def self.use_from_address_email?
+    Setting.plugin_redmine_contacts_invoices["invoices_email_from_address"].present?
+  end
+
   def self.email_from_address
-    if Setting.plugin_redmine_contacts_invoices["invoices_email_current_user"].to_i > 0
+    if InvoicesSettings.use_current_user_email?
       User.current.logged? ? "#{User.current.name} <#{User.current.mail}>" : Setting.mail_from
     else
-      Setting.plugin_redmine_contacts_invoices["invoices_email_from_address"].blank? ? Setting.mail_from : Setting.plugin_redmine_contacts_invoices["invoices_email_from_address"]
+      InvoicesSettings.use_from_address_email? ? Setting.plugin_redmine_contacts_invoices["invoices_email_from_address"] : Setting.mail_from
     end
   end
 
@@ -112,7 +120,7 @@ module RedmineInvoices
   TEMPLATE_BLANK_HEADER = "modern_blank_header"
   TEMPLATE_CUSTOM = "custom"
 
-  def self.settings() Setting[:plugin_redmine_contacts_invoices].blank? ? {} : Setting[:plugin_redmine_contacts_invoices]  end
+  def self.settings() Setting[:plugin_redmine_contacts_invoices].blank? ? {} : Setting[:plugin_redmine_contacts_invoices] end
 
   def self.invoice_lines_units
     settings[:invoices_units].blank? ? [] : settings[:invoices_units].split("\n")

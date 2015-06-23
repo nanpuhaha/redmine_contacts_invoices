@@ -46,19 +46,16 @@ class InvoicePaymentsControllerTest < ActionController::TestCase
            :journal_details,
            :queries
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/',
-                            [:contacts,
-                             :contacts_projects,
-                             :contacts_issues,
-                             :notes,
-                             :tags,
-                             :taggings])
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts).directory + '/test/fixtures/', [:contacts,
+                                                                                                                    :contacts_projects,
+                                                                                                                    :contacts_issues,
+                                                                                                                    :notes,
+                                                                                                                    :tags,
+                                                                                                                    :taggings])
 
-    ActiveRecord::Fixtures.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/',
-                          [:invoices,
-                           :invoice_lines,
-                           :invoice_payments
-                           ])
+  RedmineInvoices::TestCase.create_fixtures(Redmine::Plugin.find(:redmine_contacts_invoices).directory + '/test/fixtures/', [:invoices,
+                                                                                                                             :invoice_lines,
+                                                                                                                             :invoice_payments])
 
   def setup
     RedmineInvoices::TestCase.prepare

@@ -41,5 +41,6 @@ resources :projects do
 	resources :invoices, :only => [:index, :new, :create]
 end
 
-match "invoices_time_entries/:action", :controller => "invoices_time_entries"
+match "invoices_time_entries/new", :controller => "invoices_time_entries", :action => 'new', :via => :get
+match "invoices_time_entries/create", :controller => "invoices_time_entries", :action => 'create', :via => :port
 

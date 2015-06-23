@@ -25,7 +25,7 @@ class AddInvoicesFields < ActiveRecord::Migration
 
 
   def self.down
-    remove_column :invoices, :subject
     remove_column :invoices, :amount
+    remove_column :invoices, :subject
   end
 end

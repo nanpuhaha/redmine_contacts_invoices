@@ -24,12 +24,12 @@ class CreateInvoiceLines < ActiveRecord::Migration
       t.integer  :position
       t.decimal  :quantity, :precision => 10, :scale => 2, :default => 1, :null => false
       t.string   :description, :limit => 512
-      t.decimal  :tax, :precision => 10, :scale => 2 
+      t.decimal  :tax, :precision => 10, :scale => 2
       t.decimal  :price, :precision => 10, :scale => 2, :default => 0, :null => false
       t.string   :units
-      t.timestamps
+      t.timestamps :null => false
     end
-    add_index :invoice_lines, :invoice_id 
+    add_index :invoice_lines, :invoice_id
   end
 
   def self.down

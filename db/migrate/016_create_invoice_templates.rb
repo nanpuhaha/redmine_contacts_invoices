@@ -25,7 +25,7 @@ class CreateInvoiceTemplates < ActiveRecord::Migration
       t.text :content
       t.string :description
       t.references :author
-      t.timestamps
+      t.timestamps :null => false
     end
   end
 end

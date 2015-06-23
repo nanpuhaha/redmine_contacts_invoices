@@ -156,7 +156,7 @@ class InvoicesController < ApplicationController
 
   def update
     (render_403; return false) unless @invoice.editable_by?(User.current)
-    @invoice.safe_attributes = params[:invoice]
+    @invoice.safe_attributes = params[:invoice].merge(:discount => params[:invoice][:discount].to_f)
     if @invoice.save
       flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
@@ -282,7 +282,7 @@ class InvoicesController < ApplicationController
 
   # Filter for bulk issue invoices
   def bulk_find_invoices
-    @invoices = Invoice.find_all_by_id(params[:id] || params[:ids], :include => :project)
+    @invoices = Invoice.eager_load(:project).where(:id => params[:id] || params[:ids])
     raise ActiveRecord::RecordNotFound if @invoices.empty?
     raise Unauthorized unless @invoices.all?(&:visible?)
     @projects = @invoices.collect(&:project).compact.uniq
@@ -292,7 +292,7 @@ class InvoicesController < ApplicationController
   end
 
   def find_invoice
-    @invoice = Invoice.find(params[:id], :include => [:project, :contact])
+    @invoice = Invoice.eager_load([:project, :contact]).find(params[:id])
     @project ||= @invoice.project
   rescue ActiveRecord::RecordNotFound
     render_404

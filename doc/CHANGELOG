@@ -4,6 +4,12 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2015 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2015-06-16 v4.0.0
+
+* Redmine 3 support
+* inovice.project liquid attribute
+* Added Mark as Sent option for email sending invoices
+
 == 2015-03-25 v3.3.0
 
 * Print button for public links
