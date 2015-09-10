@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '4.0.0'
+INVOICES_VERSION_NUMBER = '4.0.1'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do

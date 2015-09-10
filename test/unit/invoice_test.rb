@@ -72,6 +72,10 @@ class InvoiceTest < ActiveSupport::TestCase
                          :status_id => 1, :priority => IssuePriority.first,
                          :subject => 'Invoice Issue 2')
 
+    @issue_3 = Issue.create(:project_id => 1, :tracker_id => 1, :author_id => 3,
+                         :status_id => 1, :priority => IssuePriority.first,
+                         :subject => 'Invoice Issue 3')
+
     @time_entrie_1 = @issue_1.time_entries.create(:spent_on => '2012-12-12',
                                 :hours    => 10,
                                 :user     => User.find(1),
@@ -82,6 +86,11 @@ class InvoiceTest < ActiveSupport::TestCase
                                 :activity => TimeEntryActivity.first)
     @time_entrie_3 = @issue_2.time_entries.create(:spent_on => '2012-12-12',
                                 :hours    => 12,
+                                :user     => User.find(2),
+                                :activity => TimeEntryActivity.first)
+
+    @time_entrie_4 = @issue_3.time_entries.create(:spent_on => '2012-12-12',
+                                :hours    => 5,
                                 :user     => User.find(2),
                                 :activity => TimeEntryActivity.first)
   end

@@ -20,7 +20,7 @@
 class InvoiceLine < ActiveRecord::Base
   unloadable
 
-  attr_accessible :description, :price, :quantity, :tax
+  attr_accessible :description, :price, :quantity, :tax, :units, :position
 
   belongs_to :invoice
 

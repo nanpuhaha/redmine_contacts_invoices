@@ -4,6 +4,13 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2015 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2015-08-25 v4.0.1
+
+* Fixed bug with creating InvoiceLine with empty units
+* Fixed bug with creating Expense with empty assigned to, project and billable
+* Expenses filters bug fixed
+* Invoice templates controller bug fixed
+
 == 2015-06-16 v4.0.0
 
 * Redmine 3 support

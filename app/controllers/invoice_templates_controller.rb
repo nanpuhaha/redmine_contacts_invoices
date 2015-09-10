@@ -44,7 +44,7 @@ class InvoiceTemplatesController < ApplicationController
     @invoice_template_count = scope.count
     @invoice_template_pages = Paginator.new @invoice_template_count, @limit, params['page']
     @offset ||= @invoice_template_pages.offset
-    @invoice_templates = scope.all(:limit => @limit, :offset => @offset, :order => "#{InvoiceTemplate.table_name}.name")
+    @invoice_templates = scope.limit(@limit).offset(@offset).order("#{InvoiceTemplate.table_name}.name").all
 
     respond_to do |format|
       format.html

@@ -263,8 +263,8 @@ class InvoicesControllerTest < ActionController::TestCase
     @request.session[:user_id] = 1
     assert_difference 'Invoice.count' do
       post :create, "invoice" => {"number"=>"1/005",
-                                  "discount"=>"10",
-                                  "lines_attributes"=>{"0"=>{"tax"=>"10",
+                                  "discount"=>"10.1",
+                                  "lines_attributes"=>{"0"=>{"tax"=>"10.2",
                                                              "price"=>"140.0",
                                                              "quantity"=>"23.0",
                                                              "units"=>"products",
@@ -283,8 +283,11 @@ class InvoicesControllerTest < ActionController::TestCase
 
     invoice = Invoice.find_by_number('1/005')
     assert_not_nil invoice
-    assert_equal 10, invoice.discount
+    assert_equal 10.1, invoice.discount
     assert_equal "Line one", invoice.lines.first.description
+    assert_equal 10.2, invoice.lines.first.tax
+    assert_equal 23.0, invoice.lines.first.quantity
+    assert_equal "products", invoice.lines.first.units
   end
 
   test "should not post create by deny user" do
