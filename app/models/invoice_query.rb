@@ -41,7 +41,7 @@ class InvoiceQuery < CrmQuery
     QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :groupable => true),
     QueryColumn.new(:created_at, :sortable => "#{Invoice.table_name}.created_at", :caption => :field_created_on),
     QueryColumn.new(:updated_at, :sortable => "#{Invoice.table_name}.updated_at", :caption => :field_updated_on),
-    QueryColumn.new(:assigned_to, :sortable => lambda {User.fields_for_order_statement}, :groupable => true),
+    QueryColumn.new(:assigned_to, :sortable => lambda {User.fields_for_order_statement}, :groupable => "#{Invoice.table_name}.assigned_to_id"),
     QueryColumn.new(:author, :sortable => lambda {User.fields_for_order_statement("authors")}),
     QueryColumn.new(:description)
   ]
@@ -57,7 +57,9 @@ class InvoiceQuery < CrmQuery
     add_available_filter "invoice_date", :type => :date, :label => :field_invoice_date
     add_available_filter "amount", :type => :float, :label => :field_invoice_amount
     add_available_filter "order_number", :type => :string, :label => :field_invoice_order_number
-    add_available_filter "currency", :type => :list, :label => :field_invoice_currency, :values => collection_for_currencies_select
+    add_available_filter "currency", :type => :list,
+                                     :label => :field_invoice_currency,
+                                     :values => collection_for_currencies_select(ContactsSetting.default_currency, ContactsSetting.major_currencies)
     add_available_filter "description", :type => :text
     add_available_filter "due_date", :type => :date, :label => :field_invoice_due_date
     add_available_filter "updated_at", :type => :date_past, :label => :field_updated_on

@@ -20,7 +20,7 @@
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
-# require 'redgreen'  
+# require 'redgreen'
 
 def fixture_files_path
   "#{File.expand_path('..',__FILE__)}/fixtures/files/"
@@ -32,6 +32,8 @@ class RedmineInvoices::TestCase
       Setting.plugin_redmine_contacts_invoices.stubs(:[]).returns(nil)
       options.each { |k, v| Setting.plugin_redmine_contacts_invoices.stubs(:[]).with(k).returns(v) }
       yield
+    ensure
+      options.each { |k, v| Setting.plugin_redmine_contacts_invoices.unstub(:[]) }
     end
   end
 
@@ -67,7 +69,7 @@ class RedmineInvoices::TestCase
       r.save
     end
 
-    Project.find(1, 2, 3, 4, 5).each do |project| 
+    Project.find(1, 2, 3, 4, 5).each do |project|
       EnabledModule.create(:project => project, :name => 'contacts_module')
       EnabledModule.create(:project => project, :name => 'contacts_invoices')
       EnabledModule.create(:project => project, :name => 'contacts_expenses')

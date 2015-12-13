@@ -34,9 +34,9 @@ de:
   label_invoice_line_grouping_by_activity: nach Aktivität
   label_invoice_line_grouping_by_issue: nach Ausstellung
   label_invoice_line_grouping_by_user: nach Benutzer
-  label_invoice_line_grouping_single_line: einzigen Zeile
+  label_invoice_line_grouping_single_line: einzige Zeile
 
-  permission_edit_own_invoices: Eigenen Rechnungen bearbeiten
+  permission_edit_own_invoices: Eigene Rechnungen bearbeiten
   permission_edit_invoices: Rechnungen bearbeiten
   permission_delete_invoices: Löschen Rechnungen
   permission_view_invoices: Rechnungen anzeigen
@@ -71,7 +71,7 @@ de:
   #1.0.1
   label_invoice_line_grouping_all: Alle
   label_invoice_default_currency: Standard Währung
-  label_invoice_total_including_tax: Zwischensummer beinhaltet Steuer
+  label_invoice_total_including_tax: Zwischensumme beinhaltet Steuer
   label_invoice_excerpt_invoice_list: Rechnungsliste herausziehen
   label_invoice_created: Rechnung erstellt
   label_invoice_disable_taxes: Steuern deaktiviert
@@ -183,7 +183,7 @@ de:
   permission_add_expenses: Aufwendung hinzufügen
 
   #3.1.0
-  field_invoice_order_number: BesteOrder number
+  field_invoice_order_number: Bestellnummer
   label_invoice_send_by_email: Sende Rechnung per E-Mail
   permission_send_invoices: Sende E-Mails
   label_invoice_mail_to: An
@@ -193,3 +193,28 @@ de:
   #3.1.1
   label_invoice_hours: Stunden
   label_invoice_email_curent_user: Aktuelle Benutzer E-Mail
+
+  #3.1.4
+  label_invoice_download_as_pdf: Herunterladen als PDF
+
+  #3.2.0
+  label_invoice_amount_paid: Bezahlter Betrag
+  label_invoices_copy_to_all: In alles kopieren
+
+  #3.2.2
+  permission_save_expenses_queries: Aufwendungsabfragen sichern
+  permission_manage_public_expenses_queries: Öffentliche Aufwendungsabfragen verwalten
+  permission_save_invoices_queries: Rechnungsabfragen sichern
+  permission_manage_public_invoices_queries: Öffentliche Rechnungsabfragen verwalten
+
+  #3.2.3
+  label_invoice_print: Drucken
+  label_invoice_new_template: Neue Rechnungsvorlage
+  label_invoice_template_custom_plural: Benutzerdefinierte Vorlagen
+  label_invoice_per_invoice_templates: Pro Rechnung Vorlagen
+
+  label_invoice_online_payments: Online-Bezahlungen
+  label_invoice_paypal_enabled: Paypal
+  label_invoice_pay_online: Online-Bezahlung
+  label_invoice_amount_due: Betrag fällig
+  field_invoice_sent_flag: Markieren als versendet

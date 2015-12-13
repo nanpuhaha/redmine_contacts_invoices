@@ -70,6 +70,8 @@ span.invoice-status.canceled {background-color: #FF3030;}
 
 div.issue.invoice table.progress td.closed { background: #F99 none repeat scroll 0%;}
 
+div.invoice.overdue .due-date .value {color: #c22;}
+
 /**********************************************************************/
 /* INVOICE LINES
 /**********************************************************************/

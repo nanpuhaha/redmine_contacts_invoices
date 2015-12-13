@@ -210,7 +210,6 @@ module RedmineInvoices
           max_width =  t.columns(5).inject(0) { |width, cell| [width, pdf.width_of(cell.content, :style => :bold) + 15].max }
           t.columns(5).width = max_width if max_width < 120
 
-
           t.row(invoice.lines.count + 2).padding = [5, 5, 3, 5]
 
           t.row(invoice.lines.count + 2..invoice.lines.count + 6).borders = []

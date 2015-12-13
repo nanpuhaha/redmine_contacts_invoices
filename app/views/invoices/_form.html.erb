@@ -38,7 +38,7 @@
     </span>
 
   </p>
-  <p><%= f.select :currency, collection_for_currencies_select, :label => l(:field_invoice_currency), :include_blank => true  %></p>
+  <p><%= f.select :currency, collection_for_currencies_select(ContactsSetting.default_currency, ContactsSetting.major_currencies), :label => l(:field_invoice_currency), :include_blank => true  %></p>
   <p class="object-select"><%= f.select :language, invoice_lang_options_for_select, {:label => l(:field_invoice_language)}  %></p>
 
 </div>

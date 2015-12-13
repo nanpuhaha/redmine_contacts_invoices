@@ -110,12 +110,12 @@ class InvoicesControllerTest < ActionController::TestCase
   test "should get index with empty settings" do
     # log_user('admin', 'admin')
     @request.session[:user_id] = 1
-    Setting.plugin_redmine_contacts_invoices = nil
     Setting.default_language = 'en'
-
-    get :index
-    assert_response :success
-    assert_template :index
+    with_invoice_settings({}) do
+      get :index
+      assert_response :success
+      assert_template :index
+    end
   end
 
   def test_index_with_short_filters
@@ -184,10 +184,13 @@ class InvoicesControllerTest < ActionController::TestCase
     end
   end
 
-  def test_index_with_query_grouped_by_contact
-    @request.session[:user_id] = 1
-    get :index, :set_filter => 1, :group_by => 'contact', :sort => 'status:desc'
-    assert_response :success
+  def test_index_with_query_grouped
+    ['contact', 'assigned_to', 'status', 'currency',
+     'language', 'project', 'order_number', 'contact_country', 'contact_city'].each do |by|
+      @request.session[:user_id] = 1
+      get :index, :set_filter => 1, :group_by => by, :sort => 'status:desc'
+      assert_response :success
+    end
   end
 
   test "should get index with sorting" do
@@ -203,7 +206,8 @@ class InvoicesControllerTest < ActionController::TestCase
     @request.session[:user_id] = 1
     Setting.default_language = 'en'
 
-    Invoice.find(1).save
+    invoice = Invoice.find(1)
+    invoice.save
 
     get :show, :id => 1
     assert_response :success

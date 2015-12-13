@@ -3,7 +3,9 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <style type="text/css">
-    .preview body { background-color: #f3f3f3;}
+    .preview body {
+      background-color: #f3f3f3;
+    }
 
     div#toolbar {
       display: none;
@@ -45,6 +47,17 @@
         margin: 2px 0px 0px;
         margin: auto;
       }
+
+      .preview div.page-break {
+        display: block;
+        clear: both;
+        page-break-after: always;
+        height: 10px;
+        border-top: 1px solid #CBCBCB;
+        border-bottom: 1px solid #CBCBCB;
+        margin: 50px -100px;
+        background-color: #f3f3f3;
+      }
     }
 
     @media print {
@@ -56,6 +69,12 @@
         margin: 2px 0px 0px;
         margin: auto;
       }
+      div.page-break {
+        display: block;
+        clear: both;
+        page-break-after: always;
+      }
+
     }
 
   </style>

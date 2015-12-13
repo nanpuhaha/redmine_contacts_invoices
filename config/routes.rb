@@ -38,9 +38,8 @@ end
 resources :invoice_comments, :only => [:create, :destroy]
 
 resources :projects do
-	resources :invoices, :only => [:index, :new, :create]
+resources :invoices, :only => [:index, :new, :create]
 end
 
-match "invoices_time_entries/new", :controller => "invoices_time_entries", :action => 'new', :via => :get
-match "invoices_time_entries/create", :controller => "invoices_time_entries", :action => 'create', :via => :port
-
+match "invoice_time_entries/new", :controller => "invoice_time_entries", :action => 'new', :via => :get
+match "invoice_time_entries/create", :controller => "invoice_time_entries", :action => 'create', :via => :post

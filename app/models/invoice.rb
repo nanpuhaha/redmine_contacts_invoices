@@ -218,6 +218,14 @@ class Invoice < ActiveRecord::Base
     CANCELED_INVOICE => :label_invoice_status_canceled
   }
 
+  STATUSES_STRINGS = {
+    DRAFT_INVOICE    => l(:label_invoice_status_draft),
+    ESTIMATE_INVOICE => l(:label_invoice_status_estimate),
+    SENT_INVOICE     => l(:label_invoice_status_sent),
+    PAID_INVOICE     => l(:label_invoice_status_paid),
+    CANCELED_INVOICE => l(:label_invoice_status_canceled)
+  }
+
   def status
     l(STATUSES[status_id])
   end
@@ -328,6 +336,9 @@ class Invoice < ActiveRecord::Base
 
   end
 
+  def overdue?
+    is_sent? && due_date && (due_date <= Date.current)
+  end
 
   def contact_country
     self.try(:contact).try(:address).try(:country)

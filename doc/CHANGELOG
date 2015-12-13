@@ -4,6 +4,16 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2015 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2015-12-11 v4.0.2
+
+* New import for invoices and exprenses
+* German translation update by Alexander Meindl
+* Unicode encoding for pdf
+* Red color for overdue invoice date
+* Fixed major currencies bug
+* Fixed template preview
+* Fixed invoice page styles for Redmine 3.2
+
 == 2015-08-25 v4.0.1
 
 * Fixed bug with creating InvoiceLine with empty units
