@@ -9,7 +9,7 @@
 
 <h2><%= "#{@invoice.is_estimate? ? l(:label_estimate) : l(:label_invoice)} ##{@invoice.number}" %></h2>
 
-<div class="issue invoice details">
+<div class="issue invoice details <%= 'overdue' if @invoice.overdue? %>">
   <div class="subject">
     <h3><%= "#{@invoice.contact.name + ' - ' if @invoice.contact}#{price_to_currency(@invoice.amount, @invoice.currency, :converted => false)}#{' - ' + @invoice.subject unless @invoice.subject.blank?}" %></h3>
   </div>

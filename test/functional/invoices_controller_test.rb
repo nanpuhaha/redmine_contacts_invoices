@@ -219,6 +219,22 @@ class InvoicesControllerTest < ActionController::TestCase
     assert_select 'div.invoice-lines table.list tr.line-data td.description', "Consulting work"
   end
 
+
+   def test_show_unassigned
+    # RedmineInvoices.settings[:total_including_tax] = true
+    # log_user('admin', 'admin')
+    @request.session[:user_id] = 1
+    Setting.default_language = 'en'
+
+    invoice = Invoice.find(1)
+    invoice.update_attribute(:assigned_to_id, nil)
+    invoice.update_attribute(:template_id, nil)
+    get :show, :id => 1
+    assert_response :success
+    assert_template :show
+    assert_not_nil assigns(:invoice)
+  end
+
   def test_put_update_with_empty_discount
     @request.session[:user_id] = 1
     put :update, :id => 1, :invoice => {:discount => ''}

@@ -4,6 +4,10 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2015 Kirill Bezrukov
 http://www.redminecrm.com/projects/invoices
 
+== 2015-12-14 v4.0.3
+
+* Fixed bug with unassigned invoice view
+
 == 2015-12-11 v4.0.2
 
 * New import for invoices and exprenses
