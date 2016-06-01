@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ resources :invoices do
   member do
     get :client_view
   end
- 	collection do
+  collection do
     get :auto_complete
- 		get :bulk_edit, :context_menu
- 		post :bulk_edit, :bulk_update
- 		delete :bulk_destroy
- 	end
+    get :bulk_edit, :context_menu
+    post :bulk_edit, :bulk_update
+    delete :bulk_destroy
+    get :recurring
+  end
 end
 
 resources :recurring_invoices do

@@ -17,31 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-module RedmineInvoices
+module RedminePeople
   module Patches
-    module ContactsHelperPatch
+    module NotifiablePatch
       def self.included(base)
-        base.send(:include, InstanceMethods)
-        base.send(:include, InvoicesHelper)
-
+        base.extend(ClassMethods)
         base.class_eval do
           unloadable
-
-          alias_method_chain :contact_tabs, :invoices
+          class << self
+              alias_method_chain :all, :crm_invoice
+          end
         end
       end
 
 
-      module InstanceMethods
+      module ClassMethods
         # include ContactsHelper
 
-        def contact_tabs_with_invoices(contact)
-          tabs = contact_tabs_without_invoices(contact)
-
-          if contact.invoices.visible.count > 0
-            tabs.push({:name => 'invoices', :partial => 'invoices/related_invoices', :label => l(:label_invoice_plural) + " (#{contact.invoices.visible.count})" } )
-          end
-          tabs
+        def all_with_crm_invoice
+          notifications = all_without_crm
+          notifications << Redmine::Notifiable.new('invoice_comment_added')
+          notifications
         end
 
       end
@@ -50,6 +46,6 @@ module RedmineInvoices
   end
 end
 
-unless ContactsHelper.included_modules.include?(RedmineInvoices::Patches::ContactsHelperPatch)
-  ContactsHelper.send(:include, RedmineInvoices::Patches::ContactsHelperPatch)
+unless Redmine::Notifiable.included_modules.include?(RedminePeople::Patches::NotifiablePatch)
+  Redmine::Notifiable.send(:include, RedminePeople::Patches::NotifiablePatch)
 end

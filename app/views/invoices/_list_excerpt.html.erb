@@ -1,6 +1,7 @@
 <%= form_tag({}) do -%>
 	<%= hidden_field_tag 'back_url', url_for(params) %>
 	<%= hidden_field_tag 'project_id', @project.id if @project %>
+	<div class="autoscroll">
 		<table class="contacts invoices index">
 		<tbody>
 	    <% previous_group = false %>
@@ -80,7 +81,5 @@
 
 			</tbody>
 	  </table>
-
+	</div>
 <% end %>
-
-

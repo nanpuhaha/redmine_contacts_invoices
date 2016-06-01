@@ -211,3 +211,25 @@ ru:
   label_invoice_pay_online: Оплатить online
   label_invoice_amount_due: К оплате
   field_invoice_sent_flag: Отметить как выставленный
+
+  #4.1.0
+  label_recurring_invoice: Рекуррентный счет
+  label_invoice_recurring_email_template: Шаблон для рекуррентных email
+  field_invoice_is_recurring: Рекуррентный счет
+  field_invoice_recurring_period: Интервал повтора
+  field_invoice_recurring_occurrences: Кол-во повторов
+  field_invoice_recurring_number: Номер повтора
+  field_invoice_recurring_action: Необходимое действие
+  field_notify_assigned: Уведомить ответсвенного о создании
+
+  recurring_period_weekly: Еженедельно
+  recurring_period_2weeks: Каждые в 2 недели
+  recurring_period_monthly: Ежемесячно
+  recurring_period_2months: Каждые 2 месяца
+  recurring_period_3months: Каждые 3 месяца
+  recurring_period_6months: Каждые 6 месяцов
+  recurring_period_yearly: Ежегодно
+
+  recurring_action_create_draft: Создать черновик
+  recurring_action_send_to_client: Отправить клиенту
+  label_invoice_comment_added: Добавлен комментарий к счету

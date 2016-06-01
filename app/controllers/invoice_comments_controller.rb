@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -34,7 +34,6 @@ class InvoiceCommentsController < ApplicationController
     if @invoice.comments << @comment
       flash[:notice] = l(:label_comment_added)
     end
-
     redirect_to :controller => 'invoices', :action => 'show', :id => @invoice
   end
 

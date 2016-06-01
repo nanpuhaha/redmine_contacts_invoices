@@ -1,8 +1,16 @@
 == Redmine Invoices plugin changelog
 
 Redmine Invoices plugin - invoicing plugin for Redmine
-Copyright (C) 2011-2015 Kirill Bezrukov
+Copyright (C) 2011-2016 RedmineCRM
 http://www.redminecrm.com/projects/invoices
+
+== 2016-06-01 v4.1.0
+
+* Recurring invoices
+* Invoice comment notification
+* Expenses API
+* Fixed pagination styles for Redmine 3.2+
+* Fixed bug with reversed comments
 
 == 2015-12-14 v4.0.3
 

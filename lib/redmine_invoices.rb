@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -26,6 +26,8 @@ require 'redmine_invoices/patches/queries_helper_patch'
 require 'redmine_invoices/patches/project_patch'
 require 'redmine_invoices/patches/contact_patch'
 require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
+require 'redmine_invoices/patches/mailer_patch'
+require 'redmine_invoices/patches/notifiable_patch'
 
 
 require 'redmine_invoices/liquid/invoices'
@@ -166,4 +168,3 @@ class String
         false
     end
 end
-

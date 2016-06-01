@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '4.0.3'
+INVOICES_VERSION_NUMBER = '4.1.0'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do
@@ -53,7 +53,7 @@ Redmine::Plugin.register :redmine_contacts_invoices do
   project_module :contacts_invoices do
     permission :view_invoices, :invoices => [:index, :show, :context_menu],
                                :recurring_invoices => [:index, :show, :context_menu]
-    permission :add_invoices, :invoices => [:new, :create]
+    permission :add_invoices, :invoices => [:new, :create, :recurring]
     permission :edit_invoices, :invoices => [:new, :create, :edit, :update, :bulk_update],
                                :invoice_time_entries => [:new]
     permission :edit_own_invoices, :invoices => [:new, :create, :edit, :update, :delete]

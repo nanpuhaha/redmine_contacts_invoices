@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@
 
 class UpdateInvoicesToSti < ActiveRecord::Migration
   def up
-    LedgerItem.update_all :type => 'Invoice'
+    Invoice.update_all :type => 'Invoice'
   end
 
   def down
-    LedgerItem.update_all :type => nil
+    Invoice.update_all :type => nil
   end
 end

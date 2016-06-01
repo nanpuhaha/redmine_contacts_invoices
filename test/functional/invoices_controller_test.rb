@@ -3,7 +3,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -198,6 +198,14 @@ class InvoicesControllerTest < ActionController::TestCase
     get :index, :sort => "amount"
     assert_response :success
     assert_template :index
+  end
+
+  test "should get index with grouping" do
+    @request.session[:user_id] = 1
+    get :index, :group_by => 'assigned_to'
+    assert_response :success
+    assert_template :index
+    assert_select 'div#contact_list tr.group'
   end
 
   test "should get show" do

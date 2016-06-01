@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ class InvoicesController < ApplicationController
   before_filter :find_invoice_project, :only => [:create, :new]
   before_filter :find_invoice, :only => [:edit, :show, :destroy, :update, :client_view]
   before_filter :bulk_find_invoices, :only => [:bulk_update, :bulk_edit, :bulk_destroy, :context_menu]
-  before_filter :authorize, :except => [:index, :edit, :update, :destroy, :auto_complete, :client_view]
+  before_filter :authorize, :except => [:index, :edit, :update, :destroy, :auto_complete, :client_view, :recurring]
   before_filter :find_optional_project, :only => [:index]
   before_filter :calc_statistics, :only => [:index, :show]
 
@@ -100,7 +100,7 @@ class InvoicesController < ApplicationController
   def show
     @invoice_lines = @invoice.lines || []
     @payments = @invoice.payments
-    @comments = @invoice.comments
+    @comments = @invoice.comments.to_a
     @comments.reverse! if User.current.wants_comments_in_reverse_order?
     respond_to do |format|
       format.html
@@ -245,6 +245,11 @@ class InvoicesController < ApplicationController
                                           'value' => invoice.id
                                           }
                                  }.to_json
+  end
+
+  def recurring
+    RecurringInvoicesService.new.process_invoices
+    render :nothing => true, :status => 200
   end
 
   private

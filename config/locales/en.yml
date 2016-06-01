@@ -219,3 +219,25 @@ en:
   label_invoice_pay_online: Pay online
   label_invoice_amount_due: Amount Due
   field_invoice_sent_flag: Mark as Sent
+
+  #4.1.0
+  label_recurring_invoice: Recurring invoice
+  label_invoice_recurring_email_template: Recurring email template
+  field_invoice_is_recurring: Recurring invoice
+  field_invoice_recurring_period: Recurring period
+  field_invoice_recurring_occurrences: Recurring occurrences
+  field_invoice_recurring_number: Recurring number
+  field_invoice_recurring_action: Recurring action
+  field_notify_assigned: Notify assigned user
+
+  recurring_period_weekly: Weekly
+  recurring_period_2weeks: Every 2 weeks
+  recurring_period_monthly: Monthly
+  recurring_period_2months: Every 2 months
+  recurring_period_3months: Every 3 months
+  recurring_period_6months: Every 6 months
+  recurring_period_yearly: Yearly
+
+  recurring_action_create_draft: Create draft
+  recurring_action_send_to_client: Send to client
+  label_invoice_comment_added: Comment added to invoice

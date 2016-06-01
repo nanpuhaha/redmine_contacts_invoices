@@ -3,7 +3,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -166,6 +166,35 @@ class InvoiceTest < ActiveSupport::TestCase
       assert_equal order.contact, invoice.contact
       assert_equal order.order_number, invoice.order_number
       assert_equal order.lines.size, invoice.lines.size
+    end
+  end
+
+  def test_should_check_recurring_references
+    recurring_invoice = Invoice.find(4)
+    recurring_instance = Invoice.find(5)
+
+    assert_equal recurring_invoice.recurring_instance?, false
+    assert_equal recurring_invoice.profile_recurring_period, nil
+    assert_equal recurring_invoice.recurring_instances, Invoice.where(:id => [5,6])
+    assert_equal recurring_invoice.recurring_profile, nil
+
+    assert_equal recurring_instance.recurring_instance?, true
+    assert_equal recurring_instance.profile_recurring_period, '1week'
+    assert_equal recurring_instance.recurring_instances, []
+    assert_equal recurring_instance.recurring_profile, recurring_invoice
+  end
+
+  def test_generate_invoice_number
+    with_invoice_settings 'invoices_invoice_number_format' => '%%YEARLY_ID%%, %%MONTHLY_ID%%, %%DAILY_ID%%, %%ID%%, %%YEAR%%, %%MONTH%%, %%DAY%%' do
+      invoice_number = Invoice.generate_invoice_number
+      next_id = '%02d' % (Invoice.last.id + 1).to_s
+      daily   = '%02d' % (Invoice.where(:invoice_date => Time.now.to_time.utc.change(:hour => 0, :min => 0)).count + 1).to_s
+      today   = Date.today
+      year    = today.year.to_s
+      month   = '%02d' % today.month.to_s
+      day     = '%02d' % today.day.to_s
+      m_count = '%03d' % (Invoice.where(:invoice_date => Time.now.beginning_of_month.utc.change(:hour => 0, :min => 0)..Time.now.end_of_month.utc.change(:hour => 0, :min => 0)).count + 1).to_s
+      assert_equal "0008, #{m_count}, #{daily}, #{next_id}, #{year}, #{month}, #{day}", invoice_number
     end
   end
 

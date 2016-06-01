@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-class AddTemplateIdToInvoices < ActiveRecord::Migration
-  def change
-    add_column :invoices, :template_id, :integer
-  end
+class RecurringInvoicesService
+
 end

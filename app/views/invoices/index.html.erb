@@ -60,7 +60,7 @@
     <p class="nodata"><%= l(:label_no_data) %></p>
   <% else %>
     <%= render :partial => invoices_list_style %>
-    <p class="pagination"><%= pagination_links_full @invoices_pages, @invoices_count %></p>
+    <span class="pagination"><%= pagination_links_full @invoices_pages, @invoices_count %></span>
   <% end %>
   </div>
 <% end %>

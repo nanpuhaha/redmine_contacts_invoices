@@ -48,6 +48,40 @@
 
 <p><%= f.text_area :description, :cols => 60, :rows => 10, :class => 'wiki-edit' %><%= wikitoolbar_for 'invoice_description' %></p>
 
+<% unless invoice.recurring_instance? %>
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <p><%= f.check_box :is_recurring, :label => l(:field_invoice_is_recurring), :onclick => "$('.recurring_attributes').is(':visible') ? $('.recurring_attributes').hide() : $('.recurring_attributes').show(); $('.recurring_attributes').next().find('input').focus(); return true;" %> </p>
+    </div>
+  </div>
+  <div class="recurring_attributes" style="white-space: nowrap; <%= f.object.is_recurring == true ? "" : "display:none;" %>">
+    <div class="splitcontent">
+      <div class="splitcontentleft">
+        <p><%= f.select :recurring_period, Invoice.recurring_periods, :label => l(:field_invoice_recurring_period) %> </p>
+        <p><%= f.select :recurring_action, Invoice.recurring_actions, :label => l(:field_invoice_recurring_action) %> </p>
+      </div>
+      <div class="splitcontentright">
+        <p><%= f.text_field :recurring_occurrences, :label => l(:field_invoice_recurring_occurrences) %> </p>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="splitcontent">
+    <div class="splitcontentleft">
+      <p>
+        <label><%= l(:field_invoice_recurring_period) %></label>
+        <%= link_to( Invoice.recurring_period_name[invoice.profile_recurring_period], invoice_path(invoice.recurring_profile_id), :class => 'recurring_profile') %>
+      </p>
+    </div>
+    <div class="splitcontentright">
+      <p>
+        <label><%= l(:field_invoice_recurring_number) %></label>
+        <%= invoice.recurring_number %>
+      </p>
+    </div>
+  </div>
+<% end %>
+
 <fieldset class="attributes">
   <legend><%= l(:label_invoice_lines) %></legend>
   <table class="invoice-lines form">

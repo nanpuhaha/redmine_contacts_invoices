@@ -1,7 +1,7 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2015 Kirill Bezrukov
+# Copyright (C) 2011-2016 Kirill Bezrukov
 # http://www.redminecrm.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
@@ -32,6 +32,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
   belongs_to :assigned_to, :class_name => "User", :foreign_key => "assigned_to_id"
   belongs_to :template, :class_name => "InvoiceTemplate"
+  belongs_to :recurring_profile, :class_name => "Invoice", :foreign_key => "recurring_profile_id"
+  has_many :recurring_instances, :class_name => "Invoice", :foreign_key => "recurring_profile_id"
   has_many :lines, :class_name => "InvoiceLine", :foreign_key => "invoice_id", :order => "position", :dependent => :delete_all
   has_many :comments, :as => :commented, :dependent => :delete_all, :order => "created_on"
   has_many :payments, :class_name => "InvoicePayment", :dependent => :delete_all, :order => "payment_date"
@@ -48,6 +50,7 @@ class Invoice < ActiveRecord::Base
   scope :paid, lambda { where(:status_id => PAID_INVOICE) }
   scope :sent_or_paid, lambda { where(["#{Invoice.table_name}.status_id = ? OR #{Invoice.table_name}.status_id = ?", PAID_INVOICE, SENT_INVOICE]) }
   scope :open, lambda { where(["#{Invoice.table_name}.status_id <> ? AND #{Invoice.table_name}.status_id <> ?", PAID_INVOICE, CANCELED_INVOICE]) }
+  scope :recurring, lambda { where(:is_recurring => true) }
 
   if ActiveRecord::VERSION::MAJOR >= 4
     acts_as_activity_provider :type => 'invoices',
@@ -111,8 +114,45 @@ class Invoice < ActiveRecord::Base
     'assigned_to_id',
     'project_id',
     'description',
+    'is_recurring',
+    'recurring_period',
+    'recurring_occurrences',
+    'recurring_action',
     'lines_attributes',
     :if => lambda {|order, user| order.new_record? || user.allowed_to?(:edit_invoices, order.project) }
+
+  def self.recurring_periods
+    [
+      [I18n.t(:recurring_period_weekly), '1week'],
+      [I18n.t(:recurring_period_2weeks), '2week'],
+      [I18n.t(:recurring_period_monthly), '1month'],
+      [I18n.t(:recurring_period_2months), '2month'],
+      [I18n.t(:recurring_period_3months), '3month'],
+      [I18n.t(:recurring_period_6months), '6month'],
+      [I18n.t(:recurring_period_yearly), '1year']
+    ]
+  end
+
+  def self.recurring_period_name
+    Hash[recurring_periods.map(&:reverse)]
+  end
+
+  def self.recurring_interval_in_seconds
+    { '1week' => 1.week.seconds,
+      '2week' => 2.week.seconds,
+      '1month' => 1.month.seconds,
+      '2month' => 2.month.seconds,
+      '3month' => 3.month.seconds,
+      '6month' => 6.month.seconds,
+      '1year' => 1.year.seconds }
+  end
+
+  def self.recurring_actions
+    [
+      [I18n.t(:recurring_action_create_draft), 0],
+      [I18n.t(:recurring_action_send_to_client), 1]
+    ]
+  end
 
   def calculate_status
     self.calculate_balance
@@ -202,7 +242,6 @@ class Invoice < ActiveRecord::Base
     invoice = arg.is_a?(Invoice) ? arg : Invoice.visible.find(arg)
     self.attributes = invoice.attributes.dup.except("id", "number", "created_at", "updated_at")
     self.lines = invoice.lines.collect{|l| InvoiceLine.new(l.attributes.dup.except("id", "created_at", "updated_at"))}
-    self.custom_field_values = invoice.custom_field_values.inject({}) {|h,v| h[v.custom_field_id] = v.value; h}
     self
   end
 
@@ -275,20 +314,20 @@ class Invoice < ActiveRecord::Base
   end
 
   def self.generate_invoice_number(project=nil)
-    result = ""
+    result = ''
     format = InvoicesSettings[:invoices_invoice_number_format, project].to_s
     if format
-      result = format.gsub(/%%ID%%/, "%02d" % (Invoice.last.try(:id).to_i + 1).to_s)
+      result = format.gsub(/%%ID%%/, '%02d' % (Invoice.last.try(:id).to_i + 1).to_s)
       result = result.gsub(/%%YEAR%%/, Date.today.year.to_s)
-      result = result.gsub(/%%MONTH%%/, "%02d" % Date.today.month.to_s)
-      result = result.gsub(/%%DAY%%/, "%02d" % Date.today.day.to_s)
-      result = result.gsub(/%%DAILY_ID%%/, "%02d" % (Invoice.count(:conditions => {:invoice_date => Time.now.to_time.utc.change(:hour => 0, :min => 0)}) + 1).to_s)
-      result = result.gsub(/%%MONTHLY_ID%%/, "%03d" % (Invoice.count(:conditions => {:invoice_date => Time.now.beginning_of_month.utc.change(:hour => 0, :min => 0).. Time.now.end_of_month.utc.change(:hour => 0, :min => 0)}) + 1).to_s)
-      result = result.gsub(/%%YEARLY_ID%%/, "%04d" % (Invoice.count(:conditions => {:invoice_date => Time.now.beginning_of_year.utc.change(:hour => 0, :min => 0).. Time.now.end_of_year.utc.change(:hour => 0, :min => 0)}) + 1).to_s)
-      result = result.gsub(/%%MONTHLY_PROJECT_ID%%/, "%03d" % (Invoice.count(:conditions => {:project_id => project, :invoice_date => Time.now.beginning_of_month.utc.change(:hour => 0, :min => 0).. Time.now.end_of_month.utc.change(:hour => 0, :min => 0)}) + 1).to_s)
-      result = result.gsub(/%%YEARLY_PROJECT_ID%%/, "%04d" % (Invoice.count(:conditions => {:project_id => project, :invoice_date => Time.now.beginning_of_year.utc.change(:hour => 0, :min => 0).. Time.now.end_of_year.utc.change(:hour => 0, :min => 0)}) + 1).to_s)
+      result = result.gsub(/%%MONTH%%/, '%02d' % Date.today.month.to_s)
+      result = result.gsub(/%%DAY%%/, '%02d' % Date.today.day.to_s)
+      result = result.gsub(/%%DAILY_ID%%/, '%02d' % (Invoice.where(:invoice_date => Time.now.to_time.utc.change(:hour => 0, :min => 0)).count + 1).to_s)
+      result = result.gsub(/%%MONTHLY_ID%%/, '%03d' % (Invoice.where(:invoice_date => Time.now.beginning_of_month.utc.change(:hour => 0, :min => 0)..Time.now.end_of_month.utc.change(:hour => 0, :min => 0)).count + 1).to_s)
+      result = result.gsub(/%%YEARLY_ID%%/, '%04d' % (Invoice.where(:invoice_date => Time.now.beginning_of_year.utc.change(:hour => 0, :min => 0)..Time.now.end_of_year.utc.change(:hour => 0, :min => 0)).count + 1).to_s)
+      result = result.gsub(/%%MONTHLY_PROJECT_ID%%/, '%03d' % (Invoice.where(:project_id => project, :invoice_date => Time.now.beginning_of_month.utc.change(:hour => 0, :min => 0)..Time.now.end_of_month.utc.change(:hour => 0, :min => 0)).count + 1).to_s)
+      result = result.gsub(/%%YEARLY_PROJECT_ID%%/, '%04d' % (Invoice.where(:project_id => project, :invoice_date => Time.now.beginning_of_year.utc.change(:hour => 0, :min => 0)..Time.now.end_of_year.utc.change(:hour => 0, :min => 0)).count + 1).to_s)
     end
-
+    result
   end
 
   def filename
@@ -346,6 +385,19 @@ class Invoice < ActiveRecord::Base
 
   def contact_city
     self.try(:contact).try(:address).try(:city)
+  end
+
+  def recurring_instance?
+    recurring_profile.present?
+  end
+
+  def profile_recurring_period
+    return nil unless recurring_instance?
+    recurring_profile.recurring_period
+  end
+
+  def notified_users
+    [author, assigned_to].reject(&:nil?)
   end
 
   private
