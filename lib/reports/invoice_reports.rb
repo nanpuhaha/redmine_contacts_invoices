@@ -154,7 +154,7 @@ module RedmineInvoices
         lines = invoice.lines.map do |line|
           [
             line.position,
-            line.description,
+            line.line_description,
             "x#{invoice_number_format(line.quantity)}",
             line.units,
             price_to_currency(line.price, invoice.currency, :converted => false, :symbol => false),

@@ -241,3 +241,5 @@ en:
   recurring_action_create_draft: Create draft
   recurring_action_send_to_client: Send to client
   label_invoice_comment_added: Comment added to invoice
+
+  label_invoices_invoice_line: Invoice lines

@@ -19,12 +19,14 @@
 
 class InvoiceLine < ActiveRecord::Base
   unloadable
+  include Redmine::SafeAttributes
 
-  attr_accessible :description, :price, :quantity, :tax, :units, :position, :invoice_id, :discount
+  attr_accessible :description, :price, :quantity, :tax, :units, :position, :invoice_id, :discount, :custom_field_values
 
   belongs_to :invoice
 
-  validates_presence_of :description, :price, :quantity
+  validates_presence_of :description, :if => Proc.new { |line| line.product_id.blank? }
+  validates_presence_of :price, :quantity
   validates_numericality_of :price, :quantity
 
   delegate :currency, :to => :invoice, :allow_nil => true
@@ -34,6 +36,9 @@ class InvoiceLine < ActiveRecord::Base
 
   acts_as_list :scope => :invoice
   acts_as_priceable :price, :total, :tax_amount
+  acts_as_customizable
+
+  safe_attributes 'custom_field_values'
 
   def total
     self.price.to_f * self.quantity.to_f * (1 - self.discount.to_f/100)
@@ -67,6 +72,9 @@ class InvoiceLine < ActiveRecord::Base
     total * tax.to_f/100
   end
 
+  def line_description
+    description
+  end
 
   private
 

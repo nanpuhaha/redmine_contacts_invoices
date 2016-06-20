@@ -1,6 +1,7 @@
+
 <tr class="line fields sortable-line" id="line-<%= f.object.id %>">
   <!-- <td><span class="sort icon icon-sort" style="cursor: row-resize;"></span> </td>  -->
-  <td class="description"><%= f.text_area :description, :no_label => true,  :rows => f.object.description.blank? ? 2 : [f.object.description.lines.count, 2].max, :onkeyup => "activateTextAreaResize(this);" %></td>
+  <%= render :partial => 'invoices/line_field_description', :locals => { :f => f } %>
   <td class="quantity"><%= f.text_field :quantity, :no_label => true, :size => 6, :onkeyup => 'updateInvoiceTotal(this)' %></td>
   <% if InvoicesSettings.show_units? %>
   <td class="units"><%= f.text_field :units, :no_label => true, :size => 8 %></td>

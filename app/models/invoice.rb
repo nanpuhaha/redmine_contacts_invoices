@@ -365,11 +365,12 @@ class Invoice < ActiveRecord::Base
       from_object.lines.each do |line|
         new_line = self.lines.new
         new_line.position = line.position if line.respond_to?(:position) && line.position
-        new_line.description = line.full_description if line.respond_to?(:full_description)
+        new_line.description = line.description if line.respond_to?(:description) && line.description.present?
         new_line.tax = line.tax if line.respond_to?(:tax) && line.tax
         new_line.quantity = line.quantity if line.respond_to?(:quantity) && line.quantity
         new_line.discount = line.discount if line.respond_to?(:discount) && line.discount
         new_line.price = line.price.to_f * (1 - new_line.discount.to_f / 100) if line.respond_to?(:price)
+        new_line.product_id = line.product_id if line.respond_to?(:product_id) && line.product_id
       end
     end
 

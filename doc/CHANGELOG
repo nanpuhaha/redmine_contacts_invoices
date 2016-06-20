@@ -4,6 +4,11 @@ Redmine Invoices plugin - invoicing plugin for Redmine
 Copyright (C) 2011-2016 RedmineCRM
 http://www.redminecrm.com/projects/invoices
 
+== 2016-06-20 v4.1.1
+
+* Added relation with products
+* Custom fields for invoice lines
+
 == 2016-06-01 v4.1.0
 
 * Recurring invoices

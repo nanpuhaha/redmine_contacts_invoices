@@ -89,6 +89,8 @@ table.invoice-lines td.price {text-align: right}
 table.invoice-lines td.tax {text-align: center;width: 1px;}
 table.invoice-lines td.tax_amount {text-align: right;}
 table.invoice-lines td.total_price {text-align: right;}
+table.invoice-lines td.description span.product {display: inline;}
+table.invoice-lines.form tr.line.fields input.string_cf, input.link_cf, select.bool_cf { width: auto !important;}
 table.invoice-lines tr.total th {
 	text-align: right;
 	padding-top: 1px;
@@ -100,6 +102,7 @@ table.invoice-lines tr.total.invoice-payment th {
 	font-weight: normal;
 }
 /*tr.sortable-line {cursor: row-resize;}*/
+div.details table.invoice-lines td.description img.gravatar {height: 32px; width: 32px;}
 
 
 /**********************************************************************/
@@ -157,6 +160,8 @@ table.invoices-stat.statuses th {padding-top: 7px;}
 table.invoice-lines.form {width: 100%;}
 table.invoice-lines.form td {border: 0px;}
 table.invoice-lines.form td.position {width: 20px;}
+table.invoice-lines.form td.product-image {vertical-align: top; width: 1px;}
+table.invoice-lines.form tr.line.fields td.item {text-align: left; width: 90%; padding-right: 10px;}
 table.invoice-lines.form tr.line.fields td.units select {max-width: 100px;min-width: 80px;}
 table.invoice-lines.form tr.line.fields td.quantity input {text-align: center;}
 table.invoice-lines.form tr.line.fields td.price input {text-align: right;}

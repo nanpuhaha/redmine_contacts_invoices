@@ -80,6 +80,37 @@ class InvoicesControllerTest < ActionController::TestCase
     assert_nil assigns(:project)
   end
 
+  def should_get_json
+    Setting.rest_api_enabled = '1'
+    @user = User.find_by_login('admin')
+    @request.env['HTTP_AUTHORIZATION'] = credentials('admin')
+
+    get :index, :format => 'json', :status_id => '*'
+    assert_response :success
+    assert_template :index
+    assert_not_nil assigns(:invoices)
+    assert_nil assigns(:project)
+    parsed_response = JSON.parse(@response.body)
+    assert_equal parsed_response['invoices'].count, 6
+  ensure
+    Setting.rest_api_enabled = '0'
+  end
+
+  def should_get_json_with_filter
+    @user = User.find_by_login('admin')
+    @request.env['HTTP_AUTHORIZATION'] = credentials('admin')
+
+    get :index, :format => 'json', :status_id => '3'
+    assert_response :success
+    assert_template :index
+    assert_not_nil assigns(:invoices)
+    assert_nil assigns(:project)
+    parsed_response = JSON.parse(@response.body)
+    assert_equal parsed_response['invoices'].count, 1
+  ensure
+    Setting.rest_api_enabled = '0'
+  end
+
   def test_get_index_with_sorting
     @request.session[:user_id] = 1
     RedmineInvoices.settings[:invoices_excerpt_invoice_list] = 1

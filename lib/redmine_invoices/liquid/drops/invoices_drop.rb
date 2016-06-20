@@ -118,4 +118,8 @@ class InvoiceLineDrop < Liquid::Drop
     @invoice_line = invoice_line
   end
 
+  def description
+    @invoice_line.line_description
+  end
+
 end

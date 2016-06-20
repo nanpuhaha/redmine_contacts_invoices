@@ -4,6 +4,9 @@
 <tr>
   <th>#</th>
   <th><%= l(:field_invoice_line_description) %></th>
+  <% InvoiceLine.new.available_custom_fields.each do |custom_field| %>
+    <th><%= custom_field.name %></th>
+  <% end %>
   <th><%= l(:field_invoice_line_quantity) %></th>
   <% if InvoicesSettings.show_units? %>
   <th><%= l(:field_invoice_line_units) %></th>
@@ -19,7 +22,7 @@
   <%= render :partial => 'invoices/line_row', :locals => {:line => line, :invoice => invoice} %>
 <% end %>
 
-<% colspan = 4 + (InvoicesSettings.show_units? ? 1 : 0) + (invoice.has_taxes? ? 1 : 0) %>
+<% colspan = 4 + (InvoicesSettings.show_units? ? 1 : 0) + (invoice.has_taxes? ? 1 : 0) + InvoiceLine.new.available_custom_fields.size %>
 
 <tr class="total delimiter"><th></th></tr>
 <tr class="total">
@@ -62,7 +65,7 @@
     <th colspan="<%= colspan %>" class="total"><%= l(:label_invoice_sub_amount) %>:</th>
     <th class="total_amount"><%= price_to_currency(invoice.subtotal, invoice.currency) %></th>
   </tr>
-  <% end %>  
+  <% end %>
 
   <% invoice.tax_groups.each do |tax_group| %>
   <tr class="total tax">
