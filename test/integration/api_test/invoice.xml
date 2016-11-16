@@ -11,6 +11,7 @@
       <price>35.0</price>
       <quantity>10</quantity>
       <units>hours</units>
+      <product_id>1</product_id>
       <description>First line item</description>
       <_destroy/>
     </0>

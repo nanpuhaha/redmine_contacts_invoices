@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '4.1.1'
+INVOICES_VERSION_NUMBER = '4.1.2'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do
@@ -31,7 +31,7 @@ Redmine::Plugin.register :redmine_contacts_invoices do
   requires_redmine :version_or_higher => '2.3'
 
   begin
-    requires_redmine_plugin :redmine_contacts, :version_or_higher => '4.0.0'
+    requires_redmine_plugin :redmine_contacts, :version_or_higher => '4.0.5'
   rescue Redmine::PluginNotFound  => e
     raise "Please install redmine_contacts plugin"
   end
@@ -52,7 +52,8 @@ Redmine::Plugin.register :redmine_contacts_invoices do
 
   project_module :contacts_invoices do
     permission :view_invoices, :invoices => [:index, :show, :context_menu],
-                               :recurring_invoices => [:index, :show, :context_menu]
+                               :recurring_invoices => [:index, :show, :context_menu],
+                               :invoice_payments => [:index, :show]
     permission :add_invoices, :invoices => [:new, :create, :recurring]
     permission :edit_invoices, :invoices => [:new, :create, :edit, :update, :bulk_update],
                                :invoice_time_entries => [:new]
@@ -74,6 +75,8 @@ Redmine::Plugin.register :redmine_contacts_invoices do
                                           nil, {:global => true}) && RedmineInvoices.settings[:invoices_show_in_app_menu]}
 
   menu :project_menu, :invoices, {:controller => 'invoices', :action => 'index'}, :caption => :label_invoice_plural, :param => :project_id
+
+  menu :project_menu, :new_invoice, {:controller => 'invoices', :action => 'new'}, :caption => :label_invoice_new, :param => :project_id, :parent => :new_object
 
   menu :admin_menu, :invoices, {:controller => 'settings', :action => 'plugin', :id => "redmine_contacts_invoices"}, :caption => :label_invoice_plural, :param => :project_id
 

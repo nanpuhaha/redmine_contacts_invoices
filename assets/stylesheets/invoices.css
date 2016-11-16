@@ -245,3 +245,7 @@ div.pdf-toolbar .buttons { float:right; margin-top: 10px; }
 div.pdf-toolbar .buttons form { display: inline; }
 div.pdf-toolbar .due-amount .small-text { margin-bottom: -1px; font-size: 11px; color: #666666; }
 div.pdf-toolbar .due-amount .amount { font-weight: bold; font-size: 20px; }
+
+table.recurring-lines { color: gray; width: 100% }
+table.recurring-lines tr.recurring-total th.label { text-align: right; font-weight: normal; }
+table.recurring-lines tr.recurring-total th.value { text-align: right; font-weight: normal; width: 9% }

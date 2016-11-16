@@ -30,8 +30,19 @@
   </div>
 
   <%= call_hook(:view_invoices_show_lines_bottom, :invoice => @invoice) %>
-
-
+  <% if @invoice.is_recurring || @invoice.recurring_instance? %>
+    <hr />
+    <table class="recurring-lines">
+      <tr class="recurring-total">
+        <th class="label"><%= label_with_currency(:field_invoice_recurring_total, @invoice.currency) %>:</th>
+        <th class="value"><%= price_to_currency(@invoice.recurring_instances_sum, @invoice.currency) %></th>
+      </tr>
+      <tr class="recurring-total">
+        <th class="label"><%= label_with_currency(:field_invoice_recurring_due_total, @invoice.currency) %>:</th>
+        <th class="label"><%= price_to_currency(@invoice.recurring_instances_due_sum, @invoice.currency) %></th>
+      </tr>
+    </table>
+  <% end %>
   <% if @invoice.attachments.any? -%>
   <hr />
   <%= link_to_attachments @invoice, :thumbnails => true %>

@@ -243,3 +243,12 @@ en:
   label_invoice_comment_added: Comment added to invoice
 
   label_invoices_invoice_line: Invoice lines
+
+  label_invoice_line_grouping_by_estimated_time: By estimated time
+
+  label_invoice_is_recurring: Is recurring
+  label_invoice_recurring_profile: Recurring profile
+  field_recurring_profile: Recurring profile
+  field_invoice_recurrings: Recurrings
+  field_invoice_recurring_total: Recurring total
+  field_invoice_recurring_due_total: Recurring amount due

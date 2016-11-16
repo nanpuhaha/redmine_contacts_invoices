@@ -30,12 +30,13 @@ resources :invoices do
   end
 end
 
-resources :recurring_invoices do
-end
+resources :recurring_invoices
 
 resources :invoices do
   resources :invoice_payments, :as => :payments
 end
+
+resources :invoice_payments, :only => [:show, :index]
 resources :invoice_comments, :only => [:create, :destroy]
 
 resources :projects do

@@ -29,6 +29,7 @@ class InvoiceTemplatesController < ApplicationController
   accept_api_auth :index
 
   include InvoicesHelper
+  helper :invoices
 
   def index
     case params[:format]

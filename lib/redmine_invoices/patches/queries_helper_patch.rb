@@ -47,7 +47,7 @@ module RedmineInvoices
           elsif [:balance, :remaining_balance].include?(column.name) && list_object.is_a?(Invoice)
             list_object.send("#{column.name.to_s}_to_s") if (list_object.is_paid? || list_object.is_sent?)
           elsif value.is_a?(Invoice)
-            invoice_tag(value, :no_contact => true, :plain => true)
+            group_invoice_tag(value).html_safe
           else
             column_value_without_invoices(column, list_object, value)
           end

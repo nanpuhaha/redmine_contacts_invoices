@@ -247,11 +247,6 @@ class InvoicesController < ApplicationController
                                  }.to_json
   end
 
-  def recurring
-    RecurringInvoicesService.new.process_invoices
-    render :nothing => true, :status => 200
-  end
-
   private
 
   def calc_statistics

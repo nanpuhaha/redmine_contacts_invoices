@@ -62,6 +62,17 @@ module InvoicesHelper
     s
   end
 
+  def group_invoice_tag(invoice)
+    invoice_title = "##{invoice.number} - #{format_date(invoice.invoice_date)}"
+    s =
+      if invoice.visible?
+        link_to(invoice_title, invoice_path(invoice), :class => 'icon icon-invoice')
+      else
+        content_tag(:span, invoice_title, :class => 'icon icon-invoice')
+      end
+    s.html_safe
+  end
+
   def contact_custom_fields
     if "ContactCustomField".is_a_defined_class?
       ContactCustomField.where("#{ContactCustomField.table_name}.field_format = 'string' OR #{ContactCustomField.table_name}.field_format = 'text'").map{|f| [f.name, f.id.to_s]}

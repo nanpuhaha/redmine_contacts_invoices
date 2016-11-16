@@ -32,8 +32,6 @@ class Invoice < ActiveRecord::Base
   belongs_to :author, :class_name => "User", :foreign_key => "author_id"
   belongs_to :assigned_to, :class_name => "User", :foreign_key => "assigned_to_id"
   belongs_to :template, :class_name => "InvoiceTemplate"
-  belongs_to :recurring_profile, :class_name => "Invoice", :foreign_key => "recurring_profile_id"
-  has_many :recurring_instances, :class_name => "Invoice", :foreign_key => "recurring_profile_id"
   has_many :lines, :class_name => "InvoiceLine", :foreign_key => "invoice_id", :order => "position", :dependent => :delete_all
   has_many :comments, :as => :commented, :dependent => :delete_all, :order => "created_on"
   has_many :payments, :class_name => "InvoicePayment", :dependent => :delete_all, :order => "payment_date"
@@ -50,7 +48,6 @@ class Invoice < ActiveRecord::Base
   scope :paid, lambda { where(:status_id => PAID_INVOICE) }
   scope :sent_or_paid, lambda { where(["#{Invoice.table_name}.status_id = ? OR #{Invoice.table_name}.status_id = ?", PAID_INVOICE, SENT_INVOICE]) }
   scope :open, lambda { where(["#{Invoice.table_name}.status_id <> ? AND #{Invoice.table_name}.status_id <> ?", PAID_INVOICE, CANCELED_INVOICE]) }
-  scope :recurring, lambda { where(:is_recurring => true) }
 
   if ActiveRecord::VERSION::MAJOR >= 4
     acts_as_activity_provider :type => 'invoices',
@@ -114,45 +111,8 @@ class Invoice < ActiveRecord::Base
     'assigned_to_id',
     'project_id',
     'description',
-    'is_recurring',
-    'recurring_period',
-    'recurring_occurrences',
-    'recurring_action',
     'lines_attributes',
     :if => lambda {|order, user| order.new_record? || user.allowed_to?(:edit_invoices, order.project) }
-
-  def self.recurring_periods
-    [
-      [I18n.t(:recurring_period_weekly), '1week'],
-      [I18n.t(:recurring_period_2weeks), '2week'],
-      [I18n.t(:recurring_period_monthly), '1month'],
-      [I18n.t(:recurring_period_2months), '2month'],
-      [I18n.t(:recurring_period_3months), '3month'],
-      [I18n.t(:recurring_period_6months), '6month'],
-      [I18n.t(:recurring_period_yearly), '1year']
-    ]
-  end
-
-  def self.recurring_period_name
-    Hash[recurring_periods.map(&:reverse)]
-  end
-
-  def self.recurring_interval_in_seconds
-    { '1week' => 1.week.seconds,
-      '2week' => 2.week.seconds,
-      '1month' => 1.month.seconds,
-      '2month' => 2.month.seconds,
-      '3month' => 3.month.seconds,
-      '6month' => 6.month.seconds,
-      '1year' => 1.year.seconds }
-  end
-
-  def self.recurring_actions
-    [
-      [I18n.t(:recurring_action_create_draft), 0],
-      [I18n.t(:recurring_action_send_to_client), 1]
-    ]
-  end
 
   def calculate_status
     self.calculate_balance
@@ -181,6 +141,12 @@ class Invoice < ActiveRecord::Base
 
   def tax_amount
     self.lines.inject(0){|sum,x| sum + x.tax_amount * discount_rate}.to_f
+  end
+
+  def order
+    if InvoicesSettings.products_plugin_installed? && !order_number.blank?
+      Order.where(:number => order_number).first
+    end
   end
 
   def subtotal
@@ -388,17 +354,20 @@ class Invoice < ActiveRecord::Base
     self.try(:contact).try(:address).try(:city)
   end
 
-  def recurring_instance?
-    recurring_profile.present?
-  end
-
-  def profile_recurring_period
-    return nil unless recurring_instance?
-    recurring_profile.recurring_period
-  end
-
   def notified_users
     [author, assigned_to].reject(&:nil?)
+  end
+
+  def recurring_instances_sum
+    return recurring_instances.sum(:amount) if is_recurring
+    return recurring_profile.recurring_instances.sum(:amount) if recurring_instance?
+    0
+  end
+
+  def recurring_instances_due_sum
+    return recurring_instances.map(&:remaining_balance).sum if is_recurring
+    return recurring_profile.recurring_instances.map(&:remaining_balance).sum if recurring_instance?
+    0
   end
 
   private
@@ -412,6 +381,4 @@ class Invoice < ActiveRecord::Base
       errors.add :status_id, :text_invoice_cant_change_status
     end
   end
-
-
 end

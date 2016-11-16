@@ -95,12 +95,23 @@ class Redmine::ApiTest::InvoicesTest < ActiveRecord::VERSION::MAJOR >= 4 ? Redmi
                                       {:success_code => :created})
     end
 
+    parameters = {:invoice => {:number => 'INV/TEST-1',
+                               :invoice_date => Date.today,
+                               :contact_id => 1,
+                               :project_id => 1,
+                               :status_id => Invoice::DRAFT_INVOICE,
+                               :lines_attributes => [{:description => "Test", :quantity => 2, :price => 10, :product_id => 1}]}}
+
+
     assert_difference('Invoice.count') do
-      post '/invoices.xml', {:invoice => {:project_id => 1, :number => 'INV/TEST-1', :contact_id => 1, :status_id => 1, :invoice_date => Date.today}}, credentials('admin')
+      post '/invoices.xml', parameters, credentials('admin')
     end
 
     invoice = Invoice.order('id DESC').first
     assert_equal 'INV/TEST-1', invoice.number
+    assert_equal 1, invoice.lines.first.product_id
+    assert_equal 20, invoice.lines.first.total
+    assert_equal 20, invoice.amount
 
     assert_response :created
     assert_equal 'application/xml', @response.content_type

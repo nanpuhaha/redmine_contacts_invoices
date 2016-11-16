@@ -22,6 +22,7 @@ class InvoicePaymentsController < ApplicationController
 
   menu_item :invoices
 
+  before_filter :find_invoice_payments, :only => [:index]
   before_filter :find_invoice_payment_invoice, :only => [:create, :new]
   before_filter :find_invoice_payment, :only => [:edit, :show, :destroy, :update]
   before_filter :bulk_find_payments, :only => [:bulk_update, :bulk_edit, :bulk_destroy, :context_menu]
@@ -29,6 +30,12 @@ class InvoicePaymentsController < ApplicationController
   before_filter :find_optional_project, :only => [:index]
 
   accept_api_auth :index, :show, :create, :update, :destroy
+
+   def index
+     respond_to do |format|
+       format.api
+     end
+   end
 
   def new
     @invoice_payment = InvoicePayment.new(:amount => @invoice.remaining_balance, :payment_date => Date.today)
@@ -70,6 +77,26 @@ class InvoicePaymentsController < ApplicationController
   end
 
   private
+
+  def find_invoice_payments
+
+    payments_scope = InvoicePayment.where({})
+    payments_scope = payments_scope.where(:invoice_id => params[:invoice_id]) if params[:invoice_id]
+    payments_scope = payments_scope.where("#{InvoicePayment.table_name}.payment_date > ?", params[:date_from]) if params[:date_from]
+    payments_scope = payments_scope.where("#{InvoicePayment.table_name}.payment_date <= ?", params[:date_to]) if params[:date_to]
+    payments_scope = payments_scope.eager_load(:invoice).where(:invoices => {:contact_id => params[:contact_id]}) if params[:contact_id]
+    payments_scope = payments_scope.where("LOWER(#{InvoicePayment.table_name}.description) LIKE ?", "%" + params[:description] + "%") if params[:description]
+    payments_scope = payments_scope.where("#{InvoicePayment.table_name}.amount > ?", params[:amount_from]) if params[:amount_from]
+    payments_scope = payments_scope.where("#{InvoicePayment.table_name}.amount <= ?", params[:amount_to]) if params[:amount_to]
+
+    @limit =  per_page_option
+    @offset = params[:page].to_i*@limit
+    @payments_count = payments_scope.count
+    @payments_pages = Paginator.new(self, @payments_count, @limit, params[:page])
+    payments_scope = payments_scope.limit(@limit).offset(@offset)
+    @invoice_payments = payments_scope
+  end
+
 
   def find_invoice_payment_invoice
     invoice_id = params[:invoice_id] || (params[:invoice_payment] && params[:invoice_payment][:invoice_id])

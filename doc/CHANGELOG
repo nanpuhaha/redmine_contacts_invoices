@@ -1,8 +1,24 @@
 == Redmine Invoices plugin changelog
 
 Redmine Invoices plugin - invoicing plugin for Redmine
-Copyright (C) 2011-2016 RedmineCRM
+Copyright (C) 2011-2016 RedmineUP
 http://www.redminecrm.com/projects/invoices
+
+== 2016-11-16 v4.1.2
+
+* Recurring profile total and due on invoice page
+* Link to recurring invoices from profile page
+* "Recurring profile" filter on invoices list
+* "Is recurring" filter on invoices list
+* Filter by Invoice ID
+* Invoice by estimated time
+* Invoice payments REST API
+* Invoice attachments REST API
+* Order number in invoice API
+* "+" button support
+* Chinese translation (Zuofeng Zhang)
+* Fixed bug with recurring invoices creation
+* Fixed bug in PDF preview
 
 == 2016-06-20 v4.1.1
 

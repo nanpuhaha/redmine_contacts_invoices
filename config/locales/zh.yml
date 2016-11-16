@@ -210,3 +210,39 @@ zh:
   permission_manage_public_expenses_queries: 管理公共支出查询
   permission_save_invoices_queries: 保存发票查询
   permission_manage_public_invoices_queries: 管理公共发票查询
+
+  #3.2.3
+  label_invoice_print: 打印
+  label_invoice_new_template: 新发票模板
+  label_invoice_template_custom_plural: 自定义模板
+  label_invoice_per_invoice_templates: 每张发票模板
+
+  label_invoice_online_payments: 在线支付
+  label_invoice_paypal_enabled: Paypal
+  label_invoice_pay_online: Pay 在线
+  label_invoice_amount_due: 金额
+  field_invoice_sent_flag: 标记发送
+
+  #4.1.0
+  label_recurring_invoice: 经常性发票
+  label_invoice_recurring_email_template: 经常性的电子邮件模板
+  field_invoice_is_recurring: 经常性发票
+  field_invoice_recurring_period: 重现期
+  field_invoice_recurring_occurrences: 经常性发生
+  field_invoice_recurring_number: 循环数
+  field_invoice_recurring_action: 经常性行为
+  field_notify_assigned: 通知指定用户
+
+  recurring_period_weekly: 每周
+  recurring_period_2weeks: 每两周
+  recurring_period_monthly: 每月
+  recurring_period_2months: 每两个月
+  recurring_period_3months: 每三个月
+  recurring_period_6months: 每六个月
+  recurring_period_yearly: 年度
+
+  recurring_action_create_draft: 创建草图
+  recurring_action_send_to_client: 发送到客户端
+  label_invoice_comment_added: 评论添加到发票
+
+  label_invoices_invoice_line: 发票行

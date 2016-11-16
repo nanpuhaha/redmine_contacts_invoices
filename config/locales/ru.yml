@@ -233,3 +233,10 @@ ru:
   recurring_action_create_draft: Создать черновик
   recurring_action_send_to_client: Отправить клиенту
   label_invoice_comment_added: Добавлен комментарий к счету
+
+  label_invoice_is_recurring: Переодический
+  label_invoice_recurring_profile: Переодический профиль
+  field_recurring_profile: Переодический профиль
+  field_invoice_recurrings: Переодические счета
+  field_invoice_recurring_total: Сумма переодических счетов
+  field_invoice_recurring_due_total: Сумма переодических счетов к оплате

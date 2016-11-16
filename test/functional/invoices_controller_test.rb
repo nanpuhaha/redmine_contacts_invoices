@@ -409,4 +409,3 @@ class InvoicesControllerTest < ActionController::TestCase
   end
 
 end
-

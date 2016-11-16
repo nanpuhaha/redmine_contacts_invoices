@@ -21,7 +21,8 @@ class InvoiceLine < ActiveRecord::Base
   unloadable
   include Redmine::SafeAttributes
 
-  attr_accessible :description, :price, :quantity, :tax, :units, :position, :invoice_id, :discount, :custom_field_values
+  attr_accessible :description, :price, :quantity, :tax, :units,
+    :position, :invoice_id, :discount, :custom_field_values, :product_id
 
   belongs_to :invoice
 
