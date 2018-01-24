@@ -8,4 +8,3 @@ else
 end
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
-gem 'liquid', '~> 2.6.3'

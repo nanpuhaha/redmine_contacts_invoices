@@ -3,8 +3,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,12 +24,13 @@ module InvoicesHelper
   include Redmine::I18n
 
   def invoices_contacts_for_select(project, options={})
-    scope = Contact.where({})
+    scope = Contact.where(options[:where])
     scope = scope.joins(:projects).uniq.where(Contact.visible_condition(User.current))
     scope = scope.joins(:invoices)
     scope = scope.where("(#{Project.table_name}.id <> -1)")
     scope = scope.where(:invoices => {:project_id => project}) if project
-    scope.limit(options[:limit] || 500).map{|c| [c.name, c.id.to_s]}
+    scope = scope.limit(options[:limit] || 500)
+    scope.to_a.sort!{|x, y| x.name <=> y.name }.collect {|m| [options[:short_label] ? m.name : m.name_with_company, m.id.to_s]}
   end
 
   def invoice_status_tag(invoice)

@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,20 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'reports/invoice_reports'
+Rails.configuration.to_prepare do
+  require 'reports/invoice_reports'
 
-require 'redmine_invoices/hooks/views_layouts_hook'
-require 'redmine_invoices/hooks/controller_contacts_duplicates_hook'
-require 'redmine_invoices/patches/application_helper_patch'
-require 'redmine_invoices/patches/queries_helper_patch'
-require 'redmine_invoices/patches/project_patch'
-require 'redmine_invoices/patches/contact_patch'
-require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
-require 'redmine_invoices/patches/mailer_patch'
-require 'redmine_invoices/patches/notifiable_patch'
+  require 'redmine_invoices/hooks/views_layouts_hook'
+  require 'redmine_invoices/hooks/controller_contacts_duplicates_hook'
+  require 'redmine_invoices/patches/application_helper_patch'
+  require 'redmine_invoices/patches/queries_helper_patch'
+  require 'redmine_invoices/patches/project_patch'
+  require 'redmine_invoices/patches/contact_patch'
+  require 'redmine_invoices/patches/add_helpers_for_invoices_patch'
+  require 'redmine_invoices/patches/mailer_patch'
+  require 'redmine_invoices/patches/notifiable_patch'
+  require 'redmine_invoices/invoice_formater'
 
-
-require 'redmine_invoices/liquid/invoices'
+  require 'redmine_invoices/liquid/invoices'
+end
 
 class InvoicesSettings
   MACRO_LIST = %w({%contact.first_name%} {%contact.last_name%} {%contact.name%} {%contact.company%} {%invoice.number%} {%invoice.invoice_date%} {%invoice.due_date%} {%invoice.public_link%})

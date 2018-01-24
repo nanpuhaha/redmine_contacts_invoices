@@ -1,8 +1,24 @@
 == Redmine Invoices plugin changelog
 
 Redmine Invoices plugin - invoicing plugin for Redmine
-Copyright (C) 2011-2016 RedmineUP
-http://www.redminecrm.com/projects/invoices
+Copyright (C) 2011-2017 RedmineUP
+http://www.redmineup.com/pages/plugins/invoices
+
+== 2017-07-07 v4.1.6
+
+* Redmine 3.4 support
+
+== 2017-05-30 v4.1.5
+
+* Chinese translation update
+* Contact filters were changed for select2
+* Fixed InvoiceLine custom field bug
+
+== 2017-02-08 v4.1.4
+
+* Liquid drop "remaining_balance" and "balance" fields for invoice
+* Notification compatibility fixes
+* Fixed line breaks in custom templates
 
 == 2016-11-17 v4.1.3
 

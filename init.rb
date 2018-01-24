@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,21 +17,23 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-INVOICES_VERSION_NUMBER = '4.1.3'
+requires_redmine_crm :version_or_higher => '0.0.31' rescue raise "\n\033[31mRedmine requires newer redmine_crm gem version.\nPlease update with 'bundle update redmine_crm'.\033[0m"
+
+INVOICES_VERSION_NUMBER = '4.1.6'
 INVOICES_VERSION_TYPE = "Light version"
 
 Redmine::Plugin.register :redmine_contacts_invoices do
   name "Redmine Invoices plugin (#{INVOICES_VERSION_TYPE})"
-  author 'RedmineCRM'
-  description 'Plugin for track invoices'
+  author 'RedmineUP'
+  description 'Plugin for track invoices and expenses'
   version INVOICES_VERSION_NUMBER
-  url 'http://redminecrm.com/projects/invoices'
-  author_url 'mailto:support@redminecrm.com'
+  url 'https://www.redmineup.com/pages/plugins/invoices'
+  author_url 'mailto:support@redmineup.com'
 
   requires_redmine :version_or_higher => '2.3'
 
   begin
-    requires_redmine_plugin :redmine_contacts, :version_or_higher => '4.0.5'
+    requires_redmine_plugin :redmine_contacts, :version_or_higher => '4.1.1'
   rescue Redmine::PluginNotFound  => e
     raise "Please install redmine_contacts plugin"
   end
@@ -78,7 +80,7 @@ Redmine::Plugin.register :redmine_contacts_invoices do
 
   menu :project_menu, :new_invoice, {:controller => 'invoices', :action => 'new'}, :caption => :label_invoice_new, :param => :project_id, :parent => :new_object
 
-  menu :admin_menu, :invoices, {:controller => 'settings', :action => 'plugin', :id => "redmine_contacts_invoices"}, :caption => :label_invoice_plural, :param => :project_id
+  menu :admin_menu, :invoices, {:controller => 'settings', :action => 'plugin', :id => "redmine_contacts_invoices"}, :caption => :label_invoice_plural, :param => :project_id, :html => {:class => 'icon'}
 
   activity_provider :invoices, :default => false, :class_name => ['InvoicePayment', 'Invoice']
 
@@ -88,6 +90,4 @@ Redmine::Plugin.register :redmine_contacts_invoices do
 
 end
 
-ActionDispatch::Callbacks.to_prepare do
-  require 'redmine_invoices'
-end
+require 'redmine_invoices'

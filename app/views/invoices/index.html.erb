@@ -65,7 +65,12 @@
   </div>
 <% end %>
 
-<%= context_menu url_for( {:controller => "invoices", :action => "context_menu"} )%>
+<% if Redmine::VERSION.to_s >= '3.4' || RedmineContacts.unstable_branch? %>
+  <%= context_menu %>
+<% else %>
+  <%= context_menu url_for( {:controller => "invoices", :action => "context_menu"} ) %>
+<% end %>
+
 
 <% content_for :sidebar do %>
   <%= render :partial => 'stat_invoiced' %>
@@ -74,7 +79,8 @@
 <% end %>
 
 <% content_for :header_tags do %>
+  <%= select2_assets %>
   <%= javascript_include_tag :contacts, :plugin => 'redmine_contacts'  %>
-	<meta name = "format-detection" content = "telephone=no">
+  <meta name = "format-detection" content = "telephone=no">
 <% end %>
 

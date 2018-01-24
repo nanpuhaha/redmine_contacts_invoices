@@ -6,5 +6,6 @@
 <% end -%>
 
 <% content_for :header_tags do %>
+  <%= select2_assets %>
   <%= javascript_include_tag :invoices, :plugin => 'redmine_contacts_invoices'  %>
 <% end %>

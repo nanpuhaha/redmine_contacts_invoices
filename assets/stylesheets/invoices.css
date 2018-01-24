@@ -82,7 +82,7 @@ table.invoice-lines tbody tr:hover { background-color:inherit;}
 table.invoice-lines tbody tr.line-data:hover { background-color:#ffffdd; }
 table.invoice-lines tr.line-data {white-space: nowrap;}
 table.invoice-lines td {padding-left: 4px; border: solid 1px #D7D7D7;}
-table.invoice-lines td.description {text-align: left;width: 70%;white-space: normal;}
+table.invoice-lines td.description {text-align: left;width: 120%;white-space: normal;}
 table.invoice-lines td.quantity {text-align: center;}
 table.invoice-lines td.units {text-align: center;}
 table.invoice-lines td.price {text-align: right}
@@ -91,6 +91,8 @@ table.invoice-lines td.tax_amount {text-align: right;}
 table.invoice-lines td.total_price {text-align: right;}
 table.invoice-lines td.description span.product {display: inline;}
 table.invoice-lines.form tr.line.fields input.string_cf, input.link_cf, select.bool_cf { width: auto !important;}
+table.invoice-lines tbody tr.total:nth-child(even),
+table.invoice-lines tbody tr.total:nth-child(odd) { background: transparent;}
 table.invoice-lines tr.total th {
 	text-align: right;
 	padding-top: 1px;

@@ -21,7 +21,7 @@
   </p>
   <p class="object-select">
     <%= label_tag :invoice_contact_id,  l(:field_invoice_contact)%>
-    <%= select_contact_tag('invoice[contact_id]', invoice.contact, :is_select => Contact.visible.by_project(ContactsSetting.cross_project_contacts? ? nil : @project).count < 50, :is_company => RedmineInvoices.settings[:invoices_select_companies], :include_blank => true, :add_contact => true, :display_field => invoice.contact.blank?) %>
+    <%= select_contact_tag('invoice[contact_id]', invoice.contact, :is_select => Contact.visible.by_project(ContactsSetting.cross_project_contacts? ? nil : @project).count < 50, :is_company => RedmineInvoices.settings[:invoices_select_companies], :include_blank => true, :add_contact => true) %>
   </p>
   <p class="object-select"><%= f.select :assigned_to_id, (@project.assignable_users.collect {|m| [m.name, m.id]}), :include_blank => true, :label => l(:field_assigned_to) %></p>
 </div>
@@ -67,8 +67,10 @@
 
     <tbody id="sortable">
       <tr style="display:none;"></tr>
-      <%= f.fields_for :lines do |builder| %>
-          <%= render :partial => 'line_fields', :locals => {:f => builder, :invoice => invoice} %>
+      <% f.object.lines.each.with_index do |line, idx| %>
+        <%= f.fields_for :lines, line do |builder| %>
+            <%= render :partial => 'line_fields', :locals => {:f => builder, :idx => idx, :invoice => invoice} %>
+        <% end %>
       <% end %>
     </tbody>
     <tr class="line-total">

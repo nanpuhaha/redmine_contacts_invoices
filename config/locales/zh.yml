@@ -246,3 +246,12 @@ zh:
   label_invoice_comment_added: 评论添加到发票
 
   label_invoices_invoice_line: 发票行
+
+  label_invoice_line_grouping_by_estimated_time: 按估计时间
+
+  label_invoice_is_recurring: 是循环
+  label_invoice_recurring_profile: 周期性配置文件
+  field_recurring_profile: 循环概要文件
+  field_invoice_recurrings: 循环
+  field_invoice_recurring_total: 周期性总计
+  field_invoice_recurring_due_total: 到期的周期性金额

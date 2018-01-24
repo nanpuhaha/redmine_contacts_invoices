@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,11 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-class InvoiceQuery < CrmQuery
+class InvoiceQuery < Query
   include RedmineCrm::MoneyHelper
   include InvoicesHelper
+  include CrmQuery
 
   self.queried_class = Invoice
+  self.view_permission = :view_invoices if Redmine::VERSION.to_s >= '3.4' || RedmineContacts.unstable_branch?
 
   self.available_columns = [
     QueryColumn.new(:number, :sortable => "#{Invoice.table_name}.number", :caption => :field_invoice_number),
@@ -70,9 +72,8 @@ class InvoiceQuery < CrmQuery
       :type => :list_status, :values => collection_invoice_statuses.map{|s| [s[0], s[1].to_s]}, :label => :field_invoice_status, :order => 1
     )
 
-    add_available_filter("contact_id",
-      :type => :list, :values => invoices_contacts_for_select(project), :label => :field_invoice_contact
-    )
+    selected_contact_ids = filters['contact_id'].present? ? Contact.visible.where(:id => filters['contact_id'][:values]).map { |c| [c.name, c.id.to_s] } : []
+    add_available_filter("contact_id", :type => :list, :field_format => 'contact', :values => selected_contact_ids, :label => :field_invoice_contact)
 
     initialize_project_filter
     initialize_author_filter
@@ -149,6 +150,10 @@ class InvoiceQuery < CrmQuery
         [:contact_country, :contact_city].include?(group_by_column.try(:name))
     includes << :assigned_to if self.filters["assigned_to_id"] || (group_by_column && [:assigned_to].include?(group_by_column.name))
     includes
+  end
+
+  def contact_query_values(values)
+    invoices_contacts_for_select(project, :where => {:id => values}, :short_label => true)
   end
 
 end

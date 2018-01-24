@@ -17,32 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_contacts_invoices.  If not, see <http://www.gnu.org/licenses/>.
 
-module RedmineInvoices
-  module Patches
-    module ContactPatch
-      def self.included(base) # :nodoc:
-        base.send(:include, InstanceMethods)
-
-        base.class_eval do
-          unloadable # Send unloadable so it will not be unloaded in development
-          has_many :invoices, :dependent => :nullify
-        end
-      end
-
-      module InstanceMethods
-        # Adds a rates tab to the user administration page
-        def invoices_balance
-          scope = self.invoices.visible
-          scope = scope.visible
-          scope = scope.where(["#{Invoice.table_name}.contact_id = ?", self.id]) unless self.blank?
-          scope.sent_or_paid.group(:currency).sum("#{Invoice.table_name}.amount - #{Invoice.table_name}.balance")
-        end
-      end
-
-    end
-  end
+if Redmine::VERSION.to_s >= '3.4' || RedmineContacts.unstable_branch?
+  require 'redmine/wiki_formatting/textile/redcloth3'
+else
+  require 'redcloth3'
 end
 
-unless Contact.included_modules.include?(RedmineInvoices::Patches::ContactPatch)
-  Contact.send(:include, RedmineInvoices::Patches::ContactPatch)
+module RedmineInvoices
+  class InvoiceFormater < RedCloth3
+    RULES = [:textile, :markdown, :block_htmlite_new_line]
+
+    def to_html(*_rules)
+      super(*RULES).to_s
+    end
+
+    private
+
+    def block_htmlite_new_line(text)
+      text.gsub!(/\n/, '<br />')
+    end
+  end
 end

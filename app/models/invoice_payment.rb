@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class InvoicePayment < ActiveRecord::Base
   acts_as_event :datetime => :created_at,
                 :url => Proc.new {|o| {:controller => 'invoices', :action => 'show', :id => o.invoice_id}},
                 :group => :invoice,
-                :type => 'icon-add-payment',
+                :type => 'icon icon-add-payment',
                 :title => Proc.new {|o| "#{l(:label_invoice_payment_created)} #{format_date(o.payment_date)} - #{o.amount.to_s}" },
                 :description => Proc.new {|o| [format_date(o.payment_date), o.description.to_s, o.invoice.blank? ? "" : o.invoice.number].join(' ') }
 

@@ -1,8 +1,8 @@
 # This file is a part of Redmine Invoices (redmine_contacts_invoices) plugin,
 # invoicing plugin for Redmine
 #
-# Copyright (C) 2011-2016 Kirill Bezrukov
-# http://www.redminecrm.com/
+# Copyright (C) 2011-2017 RedmineUP
+# https://www.redmineup.com/
 #
 # redmine_contacts_invoices is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class Invoice < ActiveRecord::Base
 
   acts_as_event :datetime => :created_at,
                 :url => Proc.new {|o| {:controller => 'invoices', :action => 'show', :id => o}},
-                :type => 'icon-invoice',
+                :type => 'icon icon-invoice',
                 :title => Proc.new {|o| "#{l(:label_invoice_created)} ##{o.number} (#{o.status}): #{o.currency + ' ' if o.currency}#{o.amount}" },
                 :description => Proc.new {|o| [o.number, o.contact ? o.contact.name : '', o.currency.to_s + " " + o.amount.to_s, o.description].join(' ') }
 
@@ -131,9 +131,9 @@ class Invoice < ActiveRecord::Base
   end
 
   def calculate_amount
-    self.amount = self.subtotal + (ContactsSetting.tax_exclusive? ? self.tax_amount : 0)
+    self.amount = subtotal.round(2) + (ContactsSetting.tax_exclusive? ? tax_amount.round(2) : 0)
     if InvoicesSettings.discount_after_tax?
-      self.amount -=  discount_amount
+      self.amount -= discount_amount.round(2)
     end
     self.amount.to_f
   end
