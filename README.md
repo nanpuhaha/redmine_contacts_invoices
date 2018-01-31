@@ -3,8 +3,21 @@
 This project is forked from RedmineUP v4.1.6 Invoice
 Also, It is customized by Jangwon Seo for in-company Redmine of Samjung Data Service Co., Ltd.
 
+---
+
+### TO-DO List
+
+- [ ] Invoice PDF 양식 변경
+- [ ] Invoice ID 양식 변경
+- [ ] Qty, Unit 외에 Time, 단가 컬럼 추가 필요
+- [ ] 당사 은행정보 Invoice 본문에 추가 필요
+- [ ] 단가 USD, EUR 소숫점 둘쨋자리 이상 받을 수 있도록 변경
+- [ ] 소숫점 둘쨋자리로 올림 언제할지 결정해서 반영 (그냥 반영하거나 선택가능한 옵션으로 추가)
+- [ ] 한글 입력 가능하도록 변경
 
 
+
+---
 
 | [![Redmine CRM Plugin](https://secure.avangate.com/images/merchant/ef452c63f81d0105dd4486f775adec81/products/1_Box_CRM_1.png)](https://secure.avangate.com/order/product.php?PRODS=4545039&QTY=1&AFFILIATE=63933)                      | [![Redmine HelpDesk plugin](https://secure.avangate.com/images/merchant/ef452c63f81d0105dd4486f775adec81/products/1_Box_helpdesk_1.png)](https://secure.avangate.com/order/product.php?PRODS=4549016&QTY=1&AFFILIATE=63933)  | [![Redmine Invoices plugin](https://secure.avangate.com/images/merchant/ef452c63f81d0105dd4486f775adec81/products/Box_invoices1.png)](https://secure.avangate.com/order/product.php?PRODS=4550948&QTY=1&AFFILIATE=63933)     | [![Redmine Agile plugin](https://secure.avangate.com/images/merchant/ef452c63f81d0105dd4486f775adec81/products/copy_Box_agile.png)](https://secure.avangate.com/order/product.php?PRODS=4619337&QTY=1&AFFILIATE=63933)   |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
